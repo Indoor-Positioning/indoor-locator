@@ -3,4 +3,9 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="header_welcome">Welcome to Indoor Locator</string>
+    <string name="prompt_floor_plan">Floor plan</string>
+    <string name="hint_floor_plan">Floor plan name</string>
+    <string name="action_select_floor_plan">Select</string>
+    <string name="action_register">Add New</string>
 </resources>
