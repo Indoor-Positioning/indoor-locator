@@ -1,11 +1,16 @@
 <resources>
-    <string name="app_name">indoor-locator-wiseass</string>
+    <string name="app_name">indoor-locator</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="header_welcome">Welcome to Indoor Locator</string>
+    <string name="header_select_floor_plan">Select Floor Plan</string>
     <string name="prompt_floor_plan">Floor plan</string>
     <string name="hint_floor_plan">Floor plan name</string>
     <string name="action_select_floor_plan">Select</string>
     <string name="action_register">Add New</string>
+    <string name="header_add_floor_plan">Add Floor Plan</string>
+    <string name="prompt_name">Name</string>
+    <string name="hint_floor_plan_name">Floor Plan Name</string>
+    <string name="prompt_add_floor_plan">add</string>
+    <string name="header_wellcome">Wellcome to Indoor Locator</string>
 </resources>

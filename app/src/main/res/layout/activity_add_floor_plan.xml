@@ -4,7 +4,7 @@
     android:id="@+id/activity_add_floor_plan"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.mooo.sestus.indoor_locator_wiseass.addfloorplan.AddFloorPlanActivity">
+    tools:context="com.mooo.sestus.indoor_locator.addfloorplan.AddFloorPlanActivity">
 
     <FrameLayout
         android:id="@+id/cont_add_floorplan"

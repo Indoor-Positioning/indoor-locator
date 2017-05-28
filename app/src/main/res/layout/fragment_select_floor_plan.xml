@@ -1,10 +1,11 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root_select_floor_plan_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
-    tools:context="com.mooo.sestus.indoor_locator_wiseass.selectfloorplan.SelectFloorPlanFragment">
+    tools:context="com.mooo.sestus.indoor_locator.selectfloorplan.SelectFloorPlanFragment">
 
     <RelativeLayout
         android:id="@+id/cont_select_floor_plan_content"
@@ -17,29 +18,19 @@
             android:id="@+id/lbl_floor_plan_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/header_welcome"
+            android:text="@string/header_select_floor_plan"
             android:layout_marginTop="16dp"
             android:gravity="center"/>
 
-        <TextView
-            style="@style/Label.Sub"
-            android:id="@+id/lbl_floor_plan_name"
+        <com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner
+            android:id="@+id/floor_plans_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:labelFor="@+id/edt_floor_plan_name"
-            android:text="@string/prompt_floor_plan"
-            android:layout_marginTop="16dp"
-            android:layout_below="@+id/lbl_floor_plan_header"
-            />
-
-        <EditText
-            style="@style/InputField.Id"
-            android:id="@+id/edt_floor_plan_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/hint_floor_plan"
-            android:layout_marginTop="16dp"
-            android:layout_below="@id/lbl_floor_plan_name"/>
+            android:hint="Floor Plan"
+            android:textColorHint="@color/colorWhite"
+            app:met_floatingLabel="normal"
+            android:layout_below="@id/lbl_floor_plan_header"
+            android:gravity="center_horizontal"/>
 
         <Button
             style="@style/Button.Flat.Primary"
@@ -48,7 +39,7 @@
             android:layout_height="48dp"
             android:text="@string/action_select_floor_plan"
             android:layout_marginTop="16dp"
-            android:layout_below="@id/edt_floor_plan_name"
+            android:layout_below="@id/floor_plans_spinner"
             android:layout_centerHorizontal="true"/>
 
         <Button

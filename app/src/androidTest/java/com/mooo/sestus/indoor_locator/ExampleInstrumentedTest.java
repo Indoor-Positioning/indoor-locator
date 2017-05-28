@@ -1,4 +1,4 @@
-package com.mooo.sestus.indoor_locator_wiseass;
+package com.mooo.sestus.indoor_locator;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

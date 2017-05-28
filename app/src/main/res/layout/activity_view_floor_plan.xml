@@ -4,10 +4,10 @@
     android:id="@+id/activity_view_floor_plan"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.mooo.sestus.indoor_locator_wiseass.viewfloorplan.ViewFloorPlanActivity">
+    tools:context="com.mooo.sestus.indoor_locator.viewfloorplan.ViewFloorPlanActivity">
 
     <FrameLayout
-        android:id="@+id/cont_view_floorplan"
+        android:id="@+id/cont_view_floor_plan_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
