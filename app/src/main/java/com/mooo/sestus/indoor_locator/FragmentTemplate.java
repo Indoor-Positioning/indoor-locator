@@ -49,12 +49,12 @@ public abstract class FragmentTemplate<Presenter extends BasePresenter> extends 
             //presenter = new Presenter();
         }
 
-        presenter.subscribe();
+        presenter.start();
     }
 
     @Override
     public void onDestroy() {
-        presenter.unSubscribe();
+        presenter.stop();
         super.onDestroy();
     }
 }

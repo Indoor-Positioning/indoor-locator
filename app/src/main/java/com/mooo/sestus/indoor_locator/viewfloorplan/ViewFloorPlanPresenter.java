@@ -26,12 +26,12 @@ public class ViewFloorPlanPresenter implements ViewFloorPlanContract.Presenter {
     }
 
     @Override
-    public void subscribe() {
+    public void start() {
 
     }
 
     @Override
-    public void unSubscribe() {
+    public void stop() {
 
     }
 }

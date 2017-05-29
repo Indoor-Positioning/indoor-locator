@@ -17,7 +17,7 @@
     <style name="Label" >
         <item name="android:fontFamily">sans-serif-light</item>
         <item name="android:alpha">.86</item>
-        <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 
     <style name="Label.FloorPlanHeader">
@@ -38,7 +38,7 @@
 
     <style name="Button.Flat" parent="Widget.AppCompat.Button.Borderless" >
         <item name="android:background">@drawable/button_flat</item>
-        <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:textColor">@color/white</item>
         <item name="android:layout_marginTop">32dp</item>
         <item name="android:minWidth">88dp</item>
         <item name="android:textSize">16sp</item>
@@ -52,5 +52,17 @@
 
     <!-- ****************************** Others ************************************ -->
 
+    <style name="Spinner">
+        <item name="android:layout_marginTop">32dp</item>
+        <item name="android:minWidth">88dp</item>
+        <item name="android:textSize">32sp</item>
+        <item name="android:paddingLeft">16sp</item>
+        <item name="android:paddingRight">16dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:popupBackground">@color/primary</item>
+        <item name="android:overlapAnchor">false</item>
+
+
+    </style>
 
 </resources>

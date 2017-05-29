@@ -48,8 +48,8 @@ public class ViewFloorPlanFragment extends Fragment implements ViewFloorPlanCont
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_view_floor_plan, container, false);
-        floorPlanName = (TextView) v.findViewById(R.id.lbl_floor_plan_name);
-        floorPlanDescription = (TextView) v.findViewById(R.id.lbl_floor_plan_name);
+        //floorPlanName = (TextView) v.findViewById(R.id.lbl_floor_plan_name);
+        //floorPlanDescription = (TextView) v.findViewById(R.id.lbl_floor_plan_name);
 
         return v;
     }
@@ -61,12 +61,12 @@ public class ViewFloorPlanFragment extends Fragment implements ViewFloorPlanCont
             presenter = new ViewFloorPlanPresenter();
         }
 
-        presenter.subscribe();
+        presenter.start();
     }
 
     @Override
     public void onDestroy() {
-        presenter.unSubscribe();
+        presenter.stop();
         super.onDestroy();
     }
 

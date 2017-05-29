@@ -5,12 +5,12 @@
 
     <style name="AppTheme" parent="AppTheme.Base">
 
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorControlNormal">@color/colorWhite</item>
-        <item name="colorControlActivated">@color/colorAccent</item>
-        <item name="android:textColorPrimary">@color/colorWhite</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primaryDark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="colorControlNormal">@color/white</item>
+        <item name="colorControlActivated">@color/accent</item>
+        <item name="android:textColorPrimary">@color/white</item>
         <item name="android:textColorHint">@android:color/darker_gray</item>
         <item name="android:fontFamily">sans-serif</item>
     </style>

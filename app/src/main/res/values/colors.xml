@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="colorInverseBackground">#E8EAF6</color>
-    <color name="errorColor">#DD2C00</color>
-    <color name="colorWhite">#FFFFFF</color>
-    <color name="colorBlack">#000000</color>
+    <color name="primary">#3F51B5</color>
+    <color name="primaryDark">#303F9F</color>
+    <color name="accent">#FF4081</color>
+    <color name="inverseBackground">#8f93a7</color>
+    <color name="error">#DD2C00</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
 </resources>
