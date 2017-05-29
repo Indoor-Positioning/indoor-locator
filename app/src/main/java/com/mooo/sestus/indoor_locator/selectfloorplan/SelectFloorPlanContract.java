@@ -7,17 +7,20 @@ import com.mooo.sestus.indoor_locator.BaseView;
 import com.mooo.sestus.indoor_locator.data.FloorPlan;
 
 import java.util.List;
+import java.util.SortedSet;
 
 /**
  * Created by mike on 5/27/17.
  */
 
-public interface SelectFloorPlanContract {
+interface SelectFloorPlanContract {
 
     interface view extends BaseView<Presenter> {
         void setLoadingIndicator();
 
-        void updateFloorPlanList(List<FloorPlan> floorPlanList);
+        void showErrorOnLoadingFloorPlans();
+
+        void updateFloorPlanList(SortedSet<FloorPlan> floorPlanList);
 
         void startViewFloorPlanActivity();
 

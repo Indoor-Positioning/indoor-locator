@@ -22,6 +22,16 @@
             android:layout_marginTop="16dp"
             android:gravity="center"/>
 
+        <TextView
+            style="@style/Label.Hint"
+            android:id="@+id/no_floor_plans"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/no_floor_plans"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:layout_below="@id/lbl_floor_plan_header"/>
+
         <fr.ganfra.materialspinner.MaterialSpinner
             style="@style/Spinner"
             android:id="@+id/floor_plans_spinner"
@@ -41,7 +51,8 @@
             app:ms_arrowSize="16dp"
             app:ms_alignLabels="false"
             android:layout_below="@id/lbl_floor_plan_header"
-            android:layout_centerHorizontal="true"/>
+            android:layout_centerHorizontal="true"
+            android:visibility="invisible"/>
 
         <Button
             style="@style/Button.Flat.Primary"

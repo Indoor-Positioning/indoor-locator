@@ -13,4 +13,5 @@
     <string name="hint_floor_plan_name">Floor Plan Name</string>
     <string name="prompt_add_floor_plan">add</string>
     <string name="header_wellcome">Wellcome to Indoor Locator</string>
+    <string name="no_floor_plans"><![CDATA[<No Floor Plans available>]]></string>
 </resources>
