@@ -12,12 +12,17 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Collections;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anySetOf;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class SelectFloorPlanPresenterTest {
 
@@ -73,6 +78,35 @@ public class SelectFloorPlanPresenterTest {
         loadFloorPlansCallback.getValue().onDataNotAvailable();
 
         verify(view).showErrorOnLoadingFloorPlans();
+    }
+
+    @Test
+    public void PresenterStopped_WhileLoadIngFloorPlans_ViewIsNotCalled() {
+        presenter.start();
+
+        verify(repository).getFloorPlans(loadFloorPlansCallback.capture());
+        presenter.stop();
+        loadFloorPlansCallback.getValue().onFloorPlansLoaded(null);
+
+        verify(view, never()).updateFloorPlanList(null);
+    }
+
+    @Test
+    public void PresenterStopped_WhileLoadIngFloorPlans_ViewShowErrorIsNotCalled() {
+        presenter.start();
+
+        verify(repository).getFloorPlans(loadFloorPlansCallback.capture());
+        presenter.stop();
+        loadFloorPlansCallback.getValue().onDataNotAvailable();
+
+        verify(view, never()).showErrorOnLoadingFloorPlans();
+    }
+
+    @Test
+    public void AddNewFloorPlan_ViewStartAddFloorPlanActivityIsCalled() {
+        presenter.addNewFloorPlan();
+
+        verify(view).startAddFloorPlanActivity();
     }
 
 }

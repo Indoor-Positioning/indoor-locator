@@ -7,10 +7,6 @@ import java.util.SortedSet;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- * Created by mike on 5/29/17.
- */
-
 public class LocalFileFloorPlanRepository implements FloorPlanRepository {
     private static LocalFileFloorPlanRepository INSTANCE;
 

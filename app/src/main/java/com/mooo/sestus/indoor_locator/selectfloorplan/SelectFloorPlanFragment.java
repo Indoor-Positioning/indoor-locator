@@ -79,7 +79,7 @@ public class SelectFloorPlanFragment extends Fragment implements SelectFloorPlan
     }
 
     @Override
-    public void startViewFloorPlanActivity() {
+    public void startViewFloorPlanActivity(String floorPlanId) {
 
     }
 

@@ -1,6 +1,8 @@
 package com.mooo.sestus.indoor_locator.selectfloorplan;
 
 import android.support.annotation.NonNull;
+
+import com.google.common.util.concurrent.AsyncCallable;
 import com.mooo.sestus.indoor_locator.data.FloorPlan;
 import com.mooo.sestus.indoor_locator.data.FloorPlanRepository;
 
@@ -11,6 +13,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 class SelectFloorPlanPresenter implements SelectFloorPlanContract.Presenter {
     private final FloorPlanRepository floorPlanRepository;
     private final SelectFloorPlanContract.view view;
+    private volatile boolean isStopped;
 
     SelectFloorPlanPresenter(FloorPlanRepository floorPlanRepository, SelectFloorPlanContract.view view) {
         this.floorPlanRepository = checkNotNull(floorPlanRepository);
@@ -20,36 +23,40 @@ class SelectFloorPlanPresenter implements SelectFloorPlanContract.Presenter {
 
     @Override
     public void start() {
-        floorPlanRepository.getFloorPlans(new FloorPlanRepository.LoadFloorPlansCallback() {
-            @Override
-            public void onFloorPlansLoaded(SortedSet<FloorPlan> floorPlans) {
-                view.updateFloorPlanList(floorPlans);
-            }
-
-            @Override
-            public void onDataNotAvailable() {
-                view.showErrorOnLoadingFloorPlans();
-            }
-        });
+        isStopped = false;
+        loadFloorPlans();
     }
 
     @Override
     public void stop() {
-
+        isStopped = true;
     }
 
     @Override
     public void addNewFloorPlan() {
-
+        view.startAddFloorPlanActivity();
     }
 
     @Override
     public void loadFloorPlans() {
 
+        floorPlanRepository.getFloorPlans(new FloorPlanRepository.LoadFloorPlansCallback() {
+            @Override
+            public void onFloorPlansLoaded(SortedSet<FloorPlan> floorPlans) {
+                if (!isStopped)
+                    view.updateFloorPlanList(floorPlans);
+            }
+
+            @Override
+            public void onDataNotAvailable() {
+                if (!isStopped)
+                    view.showErrorOnLoadingFloorPlans();
+            }
+        });
     }
 
     @Override
     public void viewFloorPlan(@NonNull FloorPlan requestedFloorPlan) {
-
+        view.startViewFloorPlanActivity(requestedFloorPlan.getId());
     }
 }
