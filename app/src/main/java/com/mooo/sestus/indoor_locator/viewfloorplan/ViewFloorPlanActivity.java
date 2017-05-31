@@ -8,6 +8,7 @@ import com.mooo.sestus.indoor_locator.R;
 
 public class ViewFloorPlanActivity extends AppCompatActivity {
     private static final String VIEW_FLOOR_PLAN_FRAGMENT = "VIEW_FLOOR_PLAN_FRAGMENT";
+    public static final String FLOOR_PLAN_ID = "FLOOR_PLAN_ID";
 
     private FragmentManager fragManager;
 

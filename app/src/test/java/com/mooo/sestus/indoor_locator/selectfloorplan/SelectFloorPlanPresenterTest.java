@@ -109,4 +109,13 @@ public class SelectFloorPlanPresenterTest {
         verify(view).startAddFloorPlanActivity();
     }
 
+    @Test
+    public void ViewFloorPlan_ViewStartViewFloorPlanActivityIsCalled() {
+        FloorPlan floorPlan = mock(FloorPlan.class);
+        when(floorPlan.getId()).thenReturn("Floor plan id");
+        presenter.viewFloorPlan(floorPlan);
+
+        verify(view).startViewFloorPlanActivity("Floor plan id");
+    }
+
 }
