@@ -32,4 +32,16 @@ public class SelectFloorPlanActivity extends AppCompatActivity {
         presenter = new SelectFloorPlanPresenter(Injection.provideFloorPlanRepository(getApplicationContext()), fragment);
 
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        presenter.stop();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        presenter.start();
+    }
 }

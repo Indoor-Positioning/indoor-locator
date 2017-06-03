@@ -32,24 +32,11 @@
             android:gravity="center"
             android:layout_below="@id/lbl_floor_plan_header"/>
 
-        <fr.ganfra.materialspinner.MaterialSpinner
+        <Spinner
             style="@style/Spinner"
             android:id="@+id/floor_plans_spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:ms_multiline="false"
-            app:ms_hint="Select Floor Plan"
-            app:ms_enableFloatingLabel="false"
-            app:ms_enableErrorLabel="false"
-            app:ms_floatingLabelText="floating label"
-            app:ms_baseColor="@color/primary"
-            app:ms_highlightColor="@color/accent"
-            app:ms_errorColor="@color/error"
-            app:ms_thickness="2dp"
-            app:ms_hintColor="@color/inverseBackground"
-            app:ms_arrowColor="@color/white"
-            app:ms_arrowSize="16dp"
-            app:ms_alignLabels="false"
             android:layout_below="@id/lbl_floor_plan_header"
             android:layout_centerHorizontal="true"
             android:visibility="invisible"/>

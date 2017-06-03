@@ -106,13 +106,4 @@ public class ViewFloorPlanFragment extends Fragment implements ViewFloorPlanCont
 
     }
 
-    @Override
-    public void makeToast(@StringRes int stringId) {
-
-    }
-
-    @Override
-    public void makeToast(String message) {
-
-    }
 }

@@ -21,7 +21,7 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
     }
 
     @Override
-    public SortedSet<FloorPlan> getFloorPlans(@NonNull FloorPlanRepository.LoadFloorPlansCallback callback) {
-        return null;
+    public void getFloorPlans(@NonNull FloorPlanRepository.LoadFloorPlansCallback callback) {
+        return;
     }
 }

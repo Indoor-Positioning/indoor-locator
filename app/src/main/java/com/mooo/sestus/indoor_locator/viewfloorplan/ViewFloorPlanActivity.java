@@ -16,7 +16,7 @@ public class ViewFloorPlanActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_floor_plan);
-        getActionBar().setTitle("Floor Plan");
+//        getActionBar().setTitle("Floor Plan");
 
         fragManager = this.getFragmentManager();
         ViewFloorPlanFragment fragment = (ViewFloorPlanFragment) fragManager.findFragmentByTag(VIEW_FLOOR_PLAN_FRAGMENT);

@@ -12,16 +12,13 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
-
 import com.mooo.sestus.indoor_locator.R;
 import com.mooo.sestus.indoor_locator.addfloorplan.AddFloorPlanActivity;
 import com.mooo.sestus.indoor_locator.data.FloorPlan;
 import com.mooo.sestus.indoor_locator.viewfloorplan.ViewFloorPlanActivity;
-
 import java.util.SortedSet;
-
-import fr.ganfra.materialspinner.MaterialSpinner;
 
 
 /**
@@ -32,8 +29,9 @@ public class SelectFloorPlanFragment extends Fragment implements SelectFloorPlan
 
     private SelectFloorPlanContract.Presenter presenter;
     private ArrayAdapter<FloorPlan> adapter;
-    private MaterialSpinner spinner;
+    private Spinner spinner;
     private TextView noFloorPlansAvailableLabel;
+
 
     public SelectFloorPlanFragment() {
         // Required empty public constructor
@@ -45,7 +43,7 @@ public class SelectFloorPlanFragment extends Fragment implements SelectFloorPlan
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_select_floor_plan, container, false);
-        spinner = (MaterialSpinner)
+        spinner = (Spinner)
                 root.findViewById(R.id.floor_plans_spinner);
         noFloorPlansAvailableLabel = (TextView) root.findViewById(R.id.no_floor_plans);
         Button selectFloorPlanButton = (Button) root.findViewById(R.id.btn_select_floor_plan);
@@ -76,13 +74,12 @@ public class SelectFloorPlanFragment extends Fragment implements SelectFloorPlan
     }
 
     @Override
-    public void updateFloorPlanList(@NonNull SortedSet<FloorPlan> floorPlanList) {
-        if (!floorPlanList.isEmpty()) {
+    public void updateFloorPlanList(@NonNull SortedSet<FloorPlan> floorPlanSet) {
+        if (!floorPlanSet.isEmpty()) {
             spinner.setVisibility(View.VISIBLE);
             noFloorPlansAvailableLabel.setVisibility(View.INVISIBLE);
-            adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, (FloorPlan[]) floorPlanList.toArray());
+            adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, floorPlanSet.toArray(new FloorPlan[2]));
             spinner.setAdapter(adapter);
-            adapter.notifyDataSetChanged();
         }
     }
 

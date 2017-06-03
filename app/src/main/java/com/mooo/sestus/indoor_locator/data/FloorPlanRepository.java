@@ -16,5 +16,5 @@ public interface FloorPlanRepository {
         void onDataNotAvailable();
     }
 
-    SortedSet<FloorPlan> getFloorPlans(@NonNull LoadFloorPlansCallback callback);
+    void getFloorPlans(@NonNull LoadFloorPlansCallback callback);
 }
