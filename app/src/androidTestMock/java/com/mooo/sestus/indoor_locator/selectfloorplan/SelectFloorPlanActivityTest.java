@@ -16,20 +16,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import java.util.SortedSet;
-import static android.support.test.espresso.Espresso.onData;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.action.ViewActions.pressBack;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasExtra;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withSpinnerText;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.hamcrest.Matchers.anything;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.AllOf.allOf;
 
 @RunWith(AndroidJUnit4.class)
@@ -39,7 +31,6 @@ public class SelectFloorPlanActivityTest {
     public final IntentsTestRule<SelectFloorPlanActivity> activityTestRule = new IntentsTestRule<>(SelectFloorPlanActivity.class, false, false);
     private Matcher<View> selectFloorPlanButton;
     private Matcher<View> addNewFloorPlanButton;
-    private Matcher<View> floorPlansSpinner;
 
     @Before
     public void setUp() {
@@ -47,7 +38,6 @@ public class SelectFloorPlanActivityTest {
         activityTestRule.launchActivity(intent);
         selectFloorPlanButton = withId(R.id.btn_select_floor_plan);
         addNewFloorPlanButton = withId(R.id.btn_add_floor_plan);
-        floorPlansSpinner = withId(R.id.floor_plans_spinner);
     }
 
     @Test

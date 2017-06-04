@@ -3,22 +3,17 @@ package com.mooo.sestus.indoor_locator.selectfloorplan;
 import com.mooo.sestus.indoor_locator.data.FloorPlan;
 import com.mooo.sestus.indoor_locator.data.FloorPlanRepository;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Collections;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -30,7 +25,7 @@ public class SelectFloorPlanPresenterTest {
     FloorPlanRepository repository;
 
     @Mock
-    SelectFloorPlanContract.view view;
+    SelectFloorPlanContract.View view;
 
     @Captor
     private ArgumentCaptor<FloorPlanRepository.LoadFloorPlansCallback> loadFloorPlansCallback;

@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -24,7 +23,7 @@ import java.util.SortedSet;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SelectFloorPlanFragment extends Fragment implements SelectFloorPlanContract.view, View.OnClickListener {
+public class SelectFloorPlanFragment extends Fragment implements SelectFloorPlanContract.View, android.view.View.OnClickListener {
 
 
     private SelectFloorPlanContract.Presenter presenter;
@@ -39,10 +38,10 @@ public class SelectFloorPlanFragment extends Fragment implements SelectFloorPlan
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public android.view.View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                          Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View root = inflater.inflate(R.layout.fragment_select_floor_plan, container, false);
+        android.view.View root = inflater.inflate(R.layout.fragment_select_floor_plan, container, false);
         spinner = (Spinner)
                 root.findViewById(R.id.floor_plans_spinner);
         noFloorPlansAvailableLabel = (TextView) root.findViewById(R.id.no_floor_plans);
@@ -76,8 +75,8 @@ public class SelectFloorPlanFragment extends Fragment implements SelectFloorPlan
     @Override
     public void updateFloorPlanList(@NonNull SortedSet<FloorPlan> floorPlanSet) {
         if (!floorPlanSet.isEmpty()) {
-            spinner.setVisibility(View.VISIBLE);
-            noFloorPlansAvailableLabel.setVisibility(View.INVISIBLE);
+            spinner.setVisibility(android.view.View.VISIBLE);
+            noFloorPlansAvailableLabel.setVisibility(android.view.View.INVISIBLE);
             adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, floorPlanSet.toArray(new FloorPlan[2]));
             spinner.setAdapter(adapter);
         }
@@ -97,7 +96,7 @@ public class SelectFloorPlanFragment extends Fragment implements SelectFloorPlan
     }
 
     @Override
-    public void onClick(View v) {
+    public void onClick(android.view.View v) {
         if (v.getId() == R.id.btn_select_floor_plan) {
             int selectedItemPos = spinner.getSelectedItemPosition();
             if (selectedItemPos != AdapterView.INVALID_POSITION) {

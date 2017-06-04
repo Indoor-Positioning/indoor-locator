@@ -2,7 +2,6 @@ package com.mooo.sestus.indoor_locator.selectfloorplan;
 
 import android.support.annotation.NonNull;
 
-import com.google.common.util.concurrent.AsyncCallable;
 import com.mooo.sestus.indoor_locator.data.FloorPlan;
 import com.mooo.sestus.indoor_locator.data.FloorPlanRepository;
 
@@ -12,10 +11,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 class SelectFloorPlanPresenter implements SelectFloorPlanContract.Presenter {
     private final FloorPlanRepository floorPlanRepository;
-    private final SelectFloorPlanContract.view view;
+    private final SelectFloorPlanContract.View view;
     private volatile boolean isStopped;
 
-    SelectFloorPlanPresenter(FloorPlanRepository floorPlanRepository, SelectFloorPlanContract.view view) {
+    SelectFloorPlanPresenter(FloorPlanRepository floorPlanRepository, SelectFloorPlanContract.View view) {
         this.floorPlanRepository = checkNotNull(floorPlanRepository);
         this.view = checkNotNull(view);
         this.view.setPresenter(this);
