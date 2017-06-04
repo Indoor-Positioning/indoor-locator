@@ -1,5 +1,6 @@
 package com.mooo.sestus.indoor_locator.addfloorplan;
 
+import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +12,12 @@ public class AddFloorPlanActivity extends AppCompatActivity {
 
     private static final String ADD_FLOOR_PLAN_FRAGMENT = "ADD_FLOOR_PLAN";
     private AddFloorPlanPresenter presenter;
+    private AddFloorPlanFragment fragment;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        fragment.onActivityResult(requestCode, resultCode, data);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,7 +26,7 @@ public class AddFloorPlanActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(R.string.header_wellcome);
 
         FragmentManager fragManager = this.getSupportFragmentManager();
-        AddFloorPlanFragment fragment = (AddFloorPlanFragment) fragManager.findFragmentByTag(ADD_FLOOR_PLAN_FRAGMENT);
+        fragment = (AddFloorPlanFragment) fragManager.findFragmentByTag(ADD_FLOOR_PLAN_FRAGMENT);
 
         if (fragment == null) {
             fragment = AddFloorPlanFragment.newInstance();

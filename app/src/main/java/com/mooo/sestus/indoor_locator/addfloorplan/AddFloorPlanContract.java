@@ -1,5 +1,6 @@
 package com.mooo.sestus.indoor_locator.addfloorplan;
 
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
@@ -19,10 +20,15 @@ public interface AddFloorPlanContract {
 
         void startViewFloorPlanActivity(String floorPlanId);
 
+        void showErrorOnSavingFloorPlan();
+
+        void showFloorPlanNameAlreadyExists();
     }
 
     interface Presenter extends BasePresenter {
-        void saveFloorPlan(String name, Uri photo);
+        void saveFloorPlan(String name, Bitmap photo);
+
+        void addPhoto();
 
         void viewFloorPlan(@NonNull FloorPlan addedFloorPlan);
 

@@ -1,5 +1,6 @@
 package com.mooo.sestus.indoor_locator.addfloorplan;
 
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
@@ -31,19 +32,43 @@ public class AddFloorPlanPresenter implements AddFloorPlanContract.Presenter {
 
     @Override
     public void stop() {
-        isStopped = false;
+        isStopped = true;
     }
 
     @Override
-    public void saveFloorPlan(String name, Uri photo) {
-        if (Strings.isNullOrEmpty(name))
+    public void saveFloorPlan(String name, Bitmap photo) {
+        if (Strings.isNullOrEmpty(name)) {
             view.showEmptyNameError();
-        if (photo == null)
+            return;
+        }
+        if (photo == null) {
             view.showEmptyPhotoError();
+            return;
+        }
+        if (repository.containsFloorPlan(name, photo)) {
+            view.showFloorPlanNameAlreadyExists();
+            return;
+        }
+        repository.saveFloorPlan(name, photo, new FloorPlanRepository.SaveFloorPlanCallback() {
+            @Override
+            public void onFloorPlanSaved(FloorPlan floorPlan) {
+                viewFloorPlan(floorPlan);
+            }
+
+            @Override
+            public void onError() {
+                view.showErrorOnSavingFloorPlan();
+            }
+        });
+
+    }
+    @Override
+    public void addPhoto() {
+        view.showPickPhotoDialog();
     }
 
     @Override
     public void viewFloorPlan(@NonNull FloorPlan addedFloorPlan) {
-
+        view.startViewFloorPlanActivity(addedFloorPlan.getId());
     }
 }

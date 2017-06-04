@@ -73,13 +73,18 @@ public class SelectFloorPlanFragment extends Fragment implements SelectFloorPlan
     }
 
     @Override
-    public void updateFloorPlanList(@NonNull SortedSet<FloorPlan> floorPlanSet) {
-        if (!floorPlanSet.isEmpty()) {
-            spinner.setVisibility(android.view.View.VISIBLE);
-            noFloorPlansAvailableLabel.setVisibility(android.view.View.INVISIBLE);
-            adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, floorPlanSet.toArray(new FloorPlan[2]));
-            spinner.setAdapter(adapter);
-        }
+    public void updateFloorPlanList(@NonNull final SortedSet<FloorPlan> floorPlanSet) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (!floorPlanSet.isEmpty()) {
+                    spinner.setVisibility(android.view.View.VISIBLE);
+                    noFloorPlansAvailableLabel.setVisibility(android.view.View.INVISIBLE);
+                    adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, floorPlanSet.toArray(new FloorPlan[0]));
+                    spinner.setAdapter(adapter);
+                }
+            }
+        });
     }
 
     @Override
