@@ -1,7 +1,6 @@
 package com.mooo.sestus.indoor_locator.addfloorplan;
 
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import com.google.common.base.Strings;
@@ -49,7 +48,7 @@ public class AddFloorPlanPresenter implements AddFloorPlanContract.Presenter {
             view.showFloorPlanNameAlreadyExists();
             return;
         }
-        repository.saveFloorPlan(name, photo, new FloorPlanRepository.SaveFloorPlanCallback() {
+        repository.addFloorPlan(name, photo, new FloorPlanRepository.SaveFloorPlanCallback() {
             @Override
             public void onFloorPlanSaved(FloorPlan floorPlan) {
                 viewFloorPlan(floorPlan);

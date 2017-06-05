@@ -32,4 +32,8 @@ public class FloorPlan implements Comparable<FloorPlan> {
     public int hashCode() {
         return Objects.hashCode(id);
     }
+
+    public Bitmap getImage() {
+        return image;
+    }
 }

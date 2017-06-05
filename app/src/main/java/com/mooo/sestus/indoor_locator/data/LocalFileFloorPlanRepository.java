@@ -3,17 +3,31 @@ package com.mooo.sestus.indoor_locator.data;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.PointF;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
+import com.mooo.sestus.indoor_locator.utils.CsvUtils;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -21,7 +35,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class LocalFileFloorPlanRepository implements FloorPlanRepository {
     private static LocalFileFloorPlanRepository INSTANCE;
     private final File appDir;
-    private TreeSet<FloorPlan> floorPlanSet;
+    private TreeMap<String, FloorPlan> floorPlanMap;
+    private HashMap<String, List<PointF>> floorPlanPoints;
+    private HashMap<String, Properties> propertiesMap;
 
     private LocalFileFloorPlanRepository(@NonNull Context context) {
         appDir = context.getFilesDir();
@@ -34,31 +50,43 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
     }
 
     @Override
-    public void saveFloorPlan(final String floorPlanName, final Bitmap bitmap, final SaveFloorPlanCallback callback) {
+    public void addPointToFloorPlan(String floorPlanId, PointF pointF) {
+        List<PointF> points = floorPlanPoints.get(floorPlanId);
+        if (points == null)
+            floorPlanPoints.put(floorPlanId, points = new ArrayList<>());
+        points.add(pointF);
+        CsvUtils.writeToCsv(propertiesMap.get(floorPlanId).getProperty("pointsPath"), pointF);
+    }
+
+    @Override
+    public List<PointF> getFloorPlanPoints(String floorPlanId) {
+        return floorPlanPoints.get(floorPlanId) == null ? Collections.<PointF>emptyList() : floorPlanPoints.get(floorPlanId);
+    }
+
+    @Override
+    public int getPinId(String floorplanId, PointF point) {
+        return floorPlanPoints.get(floorplanId).indexOf(point);
+    }
+
+    @Override
+    public void addFloorPlan(final String floorPlanName, final Bitmap bitmap, final SaveFloorPlanCallback callback) {
         final FloorPlan floorPlan = new FloorPlan(floorPlanName, bitmap);
-        floorPlanSet.add(floorPlan);
+        floorPlanMap.put(floorPlanName, floorPlan);
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                Properties properties = new Properties();
                 FileOutputStream fos = null;
-                String imageFileName = "img_" + floorPlanName + ".png";
-                String floorPlanPropsFile = floorPlanName + ".properties";
-                File imagePath = new File(appDir, imageFileName);
-                File propsPath = new File(appDir, floorPlanPropsFile);
-                properties.setProperty("name", floorPlanName);
-                properties.setProperty("imagePath", imagePath.getAbsolutePath());
+                Properties properties = new Properties();
+                setProperties(properties, floorPlanName);
+                propertiesMap.put(floorPlanName, properties);
                 try {
-                    fos = new FileOutputStream(imagePath);
+                    fos = new FileOutputStream(properties.getProperty("imagePath"));
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-                } catch (FileNotFoundException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 finally {
                     try {
-                        FileOutputStream out = new FileOutputStream(propsPath);
-                        properties.store(out, "Floor Plan Properties");
-                        out.close();
                         if (fos != null) {
                             fos.close();
                         }
@@ -74,26 +102,32 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
 
     @Override
     public boolean containsFloorPlan(String name, Bitmap bitmap) {
-        FloorPlan floorPlan = new FloorPlan(name, bitmap);
-        return floorPlanSet.contains(floorPlan);
+        return floorPlanMap.containsKey(name);
+    }
+
+    @Override
+    public FloorPlan getFloorPlanById(String floorPlanId) {
+        return floorPlanMap.get(floorPlanId);
     }
 
     @Override
     public void getFloorPlans(@NonNull final FloorPlanRepository.LoadFloorPlansCallback callback) {
-        if (floorPlanSet == null)
+        if (floorPlanMap == null)
             AsyncTask.execute(new Runnable() {
                 @Override
                 public void run() {
                     reloadFloorPlans();
-                    callback.onFloorPlansLoaded(floorPlanSet);
+                    callback.onFloorPlansLoaded(floorPlanMap.values());
                 }
             });
         else
-            callback.onFloorPlansLoaded(floorPlanSet);
+            callback.onFloorPlansLoaded(floorPlanMap.values());
     }
 
     private void reloadFloorPlans() {
-        floorPlanSet = new TreeSet<>();
+        floorPlanMap = new TreeMap<>();
+        propertiesMap = new HashMap<>();
+        floorPlanPoints = new HashMap<>();
         File[] files = appDir.listFiles();
         for (File file : files) {
             if (file.getName().endsWith(".properties")) {
@@ -107,6 +141,12 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
                 if (!floorPlanProps.isEmpty()) {
                     String name = floorPlanProps.getProperty("name");
                     String imagePath = floorPlanProps.getProperty("imagePath");
+                    String pointsPath = floorPlanProps.getProperty("pointsPath");
+                    propertiesMap.put(name, floorPlanProps);
+                    if (pointsPath != null && new File(pointsPath).exists()) {
+                        List<PointF> points = CsvUtils.readCsv(new File(pointsPath));
+                        floorPlanPoints.put(name, points);
+                    }
                     File imageFile = new File(imagePath);
                     Bitmap image = null;
                     try {
@@ -115,9 +155,33 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
                         e.printStackTrace();
                     }
                     if (image != null)
-                        floorPlanSet.add(new FloorPlan(name, image));
+                        floorPlanMap.put(name, new FloorPlan(name, image));
                 }
             }
         }
     }
+
+    private void setProperties(Properties properties, String floorPlanName) {
+        String imageFileName = "img_" + floorPlanName + ".png";
+        String pointsFileName = "points_" + floorPlanName + ".txt";
+        String floorPlanPropsFile = floorPlanName + ".properties";
+        File imagePath = new File(appDir, imageFileName);
+        File pointsPath = new File(appDir, pointsFileName);
+        File propsPath = new File(appDir, floorPlanPropsFile);
+        properties.setProperty("name", floorPlanName);
+        properties.setProperty("imagePath", imagePath.getAbsolutePath());
+        properties.setProperty("pointsPath", pointsPath.getAbsolutePath());
+        try {
+            FileOutputStream out = new FileOutputStream(propsPath);
+            properties.store(out, "Floor Plan Properties");
+            out.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
 }

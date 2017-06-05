@@ -4,14 +4,15 @@ import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import com.mooo.sestus.indoor_locator.Injection;
 import com.mooo.sestus.indoor_locator.R;
 
-public class AddFloorPlanActivity extends AppCompatActivity {
+public class AddFloorPlanActivity extends AppCompatActivity implements AddFloorPlanContract.View{
 
     private static final String ADD_FLOOR_PLAN_FRAGMENT = "ADD_FLOOR_PLAN";
-    private AddFloorPlanPresenter presenter;
+    private AddFloorPlanContract.Presenter presenter;
     private AddFloorPlanFragment fragment;
 
     @Override
@@ -23,7 +24,7 @@ public class AddFloorPlanActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_floor_plan);
-        getSupportActionBar().setTitle(R.string.header_wellcome);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         FragmentManager fragManager = this.getSupportFragmentManager();
         fragment = (AddFloorPlanFragment) fragManager.findFragmentByTag(ADD_FLOOR_PLAN_FRAGMENT);
@@ -51,4 +52,44 @@ public class AddFloorPlanActivity extends AppCompatActivity {
         presenter.start();
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        finish();
+        return true;
+    }
+
+    @Override
+    public void setPresenter(AddFloorPlanContract.Presenter presenter) {
+        this.presenter = presenter;
+    }
+
+    @Override
+    public void showPickPhotoDialog() {
+
+    }
+
+    @Override
+    public void showEmptyNameError() {
+
+    }
+
+    @Override
+    public void showEmptyPhotoError() {
+
+    }
+
+    @Override
+    public void startViewFloorPlanActivity(String floorPlanId) {
+
+    }
+
+    @Override
+    public void showErrorOnSavingFloorPlan() {
+
+    }
+
+    @Override
+    public void showFloorPlanNameAlreadyExists() {
+
+    }
 }

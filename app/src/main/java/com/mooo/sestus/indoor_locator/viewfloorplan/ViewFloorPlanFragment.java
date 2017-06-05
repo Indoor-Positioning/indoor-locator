@@ -1,109 +1,121 @@
 package com.mooo.sestus.indoor_locator.viewfloorplan;
 
 
-import android.app.Fragment;
-import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Toast;
 
+import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.mooo.sestus.indoor_locator.R;
-import com.mooo.sestus.indoor_locator.selectfloorplan.SelectFloorPlanActivity;
+
+import java.util.Collection;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ViewFloorPlanFragment extends Fragment implements ViewFloorPlanContract.view  {
+public class ViewFloorPlanFragment extends Fragment implements ViewFloorPlanContract.View {
     private ViewFloorPlanContract.Presenter presenter;
-
-    private TextView floorPlanName, floorPlanDescription;
-    private ImageView thumbnail;
-    private FloatingActionButton editDetails;
-    private ImageButton settins, exitFloorPlan;
+    private String floorPlanId;
+    private PinView floorPlanImage;
+    private FloatingActionButton confirmPinFab;
 
 
     public ViewFloorPlanFragment() {
         // Required empty public constructor
     }
 
-    public static ViewFloorPlanFragment newInstance() {
-        return new ViewFloorPlanFragment();
+    public static ViewFloorPlanFragment newInstance(String floorPlanId) {
+        ViewFloorPlanFragment floorPlanFragment = new ViewFloorPlanFragment();
+        floorPlanFragment.floorPlanId = floorPlanId;
+        return floorPlanFragment;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setRetainInstance(true);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public android.view.View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                          Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_view_floor_plan, container, false);
-        //floorPlanName = (TextView) v.findViewById(R.id.lbl_floor_plan_name);
-        //floorPlanDescription = (TextView) v.findViewById(R.id.lbl_floor_plan_name);
-
+        floorPlanImage = (PinView) v.findViewById(R.id.imageView);
         return v;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (presenter == null) {
-            presenter = new ViewFloorPlanPresenter();
-        }
-
-        presenter.start();
-    }
-
-    @Override
-    public void onDestroy() {
-        presenter.stop();
-        super.onDestroy();
-    }
-
-    @Override
-    public void setName(String name) {
-
-    }
-
-    @Override
-    public void setDescription(String description) {
-
-    }
-
-    @Override
-    public void startSelectFloorPlanActivity() {
-        Intent i = new Intent(getActivity(), SelectFloorPlanActivity.class);
-        startActivity(i);
-    }
-
-    @Override
-    public void setDefaultFloorPlanPhoto() {
-
-    }
-
-    @Override
-    public void setFloorPlanPhoto() {
-
-    }
-
-    @Override
-    public void setThumbnailLoadingIndicator(boolean show) {
-
+        confirmPinFab = (FloatingActionButton) getActivity().findViewById(R.id.fab_confirm);
+        confirmPinFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.onPinConfirmed();
+                confirmPinFab.setVisibility(View.GONE);
+            }
+        });
+        final GestureDetector gestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+                if (floorPlanImage.isReady()) {
+                    presenter.onUserClickedFloorPlan(floorPlanImage.viewToSourceCoord(e.getX(), e.getY()));
+                } else {
+                    Toast.makeText(getContext(), "Single tap: Image not ready", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            }
+        });
+        floorPlanImage.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return gestureDetector.onTouchEvent(event);
+            }
+        });
     }
 
     @Override
     public void setPresenter(ViewFloorPlanContract.Presenter presenter) {
+        this.presenter = presenter;
+    }
+
+    @Override
+    public void showFloorPlanImage(Bitmap bitmap, Collection<PointF> pinnedLocations) {
+        floorPlanImage.setImage(ImageSource.bitmap(bitmap));
+        floorPlanImage.setPins(pinnedLocations);
+    }
+
+    @Override
+    public void showConfirmAddPinToFloorPlan(PointF pin) {
+        floorPlanImage.addNewPin(pin);
+        confirmPinFab.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void showStartScanningActivity(String floorPlanId, int pinnedLocationId) {
 
     }
 
+    @Override
+    public void showPin(PointF pin) {
+        floorPlanImage.setAddedPin(pin);
+    }
+
+    @Override
+    public void showSelectedPin(PointF pin) {
+        floorPlanImage.setSelectedPin(pin);
+    }
+
+    @Override
+    public void removePin(PointF pin) {
+        floorPlanImage.removePin(pin);
+    }
 }

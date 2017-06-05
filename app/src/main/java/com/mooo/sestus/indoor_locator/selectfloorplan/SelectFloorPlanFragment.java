@@ -17,6 +17,8 @@ import com.mooo.sestus.indoor_locator.R;
 import com.mooo.sestus.indoor_locator.addfloorplan.AddFloorPlanActivity;
 import com.mooo.sestus.indoor_locator.data.FloorPlan;
 import com.mooo.sestus.indoor_locator.viewfloorplan.ViewFloorPlanActivity;
+
+import java.util.Collection;
 import java.util.SortedSet;
 
 
@@ -73,7 +75,7 @@ public class SelectFloorPlanFragment extends Fragment implements SelectFloorPlan
     }
 
     @Override
-    public void updateFloorPlanList(@NonNull final SortedSet<FloorPlan> floorPlanSet) {
+    public void updateFloorPlanList(@NonNull final Collection<FloorPlan> floorPlanSet) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {

@@ -12,7 +12,6 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -66,7 +65,7 @@ public class AddFloorPlanPresenterTest {
         Bitmap bitmap = mock(Bitmap.class);
         presenter.saveFloorPlan("asd", bitmap);
 
-        verify(repository).saveFloorPlan(eq("asd"), eq(bitmap), any(FloorPlanRepository.SaveFloorPlanCallback.class));
+        verify(repository).addFloorPlan(eq("asd"), eq(bitmap), any(FloorPlanRepository.SaveFloorPlanCallback.class));
     }
 
     @Test
@@ -76,7 +75,7 @@ public class AddFloorPlanPresenterTest {
         when(floorPlan.getId()).thenReturn("Mock_id");
         presenter.saveFloorPlan("asd", bitmap);
 
-        verify(repository).saveFloorPlan(eq("asd"), eq(bitmap), saveFloorPlanCallback.capture());
+        verify(repository).addFloorPlan(eq("asd"), eq(bitmap), saveFloorPlanCallback.capture());
         saveFloorPlanCallback.getValue().onFloorPlanSaved(floorPlan);
         verify(view).startViewFloorPlanActivity("Mock_id");
     }

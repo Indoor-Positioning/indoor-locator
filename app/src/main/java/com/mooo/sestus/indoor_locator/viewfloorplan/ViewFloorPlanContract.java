@@ -1,36 +1,35 @@
 package com.mooo.sestus.indoor_locator.viewfloorplan;
 
+import android.graphics.Bitmap;
+import android.graphics.PointF;
+
 import com.mooo.sestus.indoor_locator.BasePresenter;
 import com.mooo.sestus.indoor_locator.BaseView;
 
-/**
- * Created by mike on 5/27/17.
- */
+import java.util.Collection;
+
 
 public interface ViewFloorPlanContract {
 
-    interface view extends BaseView<Presenter> {
+    interface View extends BaseView<Presenter> {
+        void showFloorPlanImage(Bitmap image, Collection<PointF> pinnedLocations);
 
-        void setName(String name);
+        void showConfirmAddPinToFloorPlan(PointF pin);
 
-        void setDescription(String description);
+        void showStartScanningActivity(String floorPlanId, int pinnedLocationId);
 
-        void startSelectFloorPlanActivity();
+        void showPin(PointF pin);
 
-        void setDefaultFloorPlanPhoto();
+        void showSelectedPin(PointF pin);
 
-        void setFloorPlanPhoto();
-
-        void setThumbnailLoadingIndicator(boolean show);
+        void removePin(PointF awaitingPin);
     }
 
     interface Presenter extends BasePresenter {
-        void onThumbnailClick();
+        void onPinConfirmed();
 
-        void onEditFloorPlanClick();
+        void recordFingerprints(PointF pin);
 
-        void onThumbnailLoaded();
-
-        void onFloorPlanExitClick();
+        void onUserClickedFloorPlan(PointF pointF);
     }
 }

@@ -1,34 +1,22 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/content"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="fill_parent" >
 
-    <RelativeLayout
-        android:id="@+id/text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="#333">
+        <com.mooo.sestus.indoor_locator.viewfloorplan.PinView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_marginBottom="30dp"
+            android:layout_marginTop="10dp"/>
 
         <TextView
             android:id="@+id/note"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:layout_centerVertical="true"
-            android:text="Floor Plan"
+            android:text="Touch Image to start recording on Location"
             android:gravity="center_horizontal"
-            android:padding="10dp"
             android:textSize="14sp"
-            android:textColor="#FFFFFF"/>
-
-    </RelativeLayout>
-
-    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
-        android:id="@+id/imageView"
-        android:layout_alignParentTop="true"
-        android:layout_above="@+id/text"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
-
+            android:textColor="@color/black"
+            android:layout_below="@id/imageView"/>
 </RelativeLayout>

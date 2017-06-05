@@ -1,9 +1,12 @@
 package com.mooo.sestus.indoor_locator.data;
 
 import android.graphics.Bitmap;
+import android.graphics.PointF;
 import android.support.annotation.BinderThread;
 import android.support.annotation.NonNull;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.SortedSet;
 
 /**
@@ -12,9 +15,17 @@ import java.util.SortedSet;
 
 public interface FloorPlanRepository {
 
-    void saveFloorPlan(String name, Bitmap bitmap, SaveFloorPlanCallback callback);
+    void addPointToFloorPlan(String floorPlanId, PointF pointF);
+
+    List<PointF> getFloorPlanPoints(String floorPlanId);
+
+    int getPinId(String floorplanId, PointF point);
+
+    void addFloorPlan(String name, Bitmap bitmap, SaveFloorPlanCallback callback);
 
     boolean containsFloorPlan(String name, Bitmap bitmap);
+
+    FloorPlan getFloorPlanById(String floorPlanId);
 
     interface SaveFloorPlanCallback {
         void onFloorPlanSaved(FloorPlan floorPlan);
@@ -23,7 +34,7 @@ public interface FloorPlanRepository {
     }
 
     interface LoadFloorPlansCallback {
-        void onFloorPlansLoaded(SortedSet<FloorPlan> floorPlans);
+        void onFloorPlansLoaded(Collection<FloorPlan> floorPlans);
 
         void onDataNotAvailable();
     }

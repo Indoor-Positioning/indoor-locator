@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import com.mooo.sestus.indoor_locator.data.FloorPlan;
 import com.mooo.sestus.indoor_locator.data.FloorPlanRepository;
 
+import java.util.Collection;
 import java.util.SortedSet;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -41,7 +42,7 @@ class SelectFloorPlanPresenter implements SelectFloorPlanContract.Presenter {
 
         floorPlanRepository.getFloorPlans(new FloorPlanRepository.LoadFloorPlansCallback() {
             @Override
-            public void onFloorPlansLoaded(SortedSet<FloorPlan> floorPlans) {
+            public void onFloorPlansLoaded(Collection<FloorPlan> floorPlans) {
                 if (!isStopped)
                     view.updateFloorPlanList(floorPlans);
             }

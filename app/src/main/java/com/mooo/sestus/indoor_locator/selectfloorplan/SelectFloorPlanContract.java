@@ -6,12 +6,10 @@ import com.mooo.sestus.indoor_locator.BasePresenter;
 import com.mooo.sestus.indoor_locator.BaseView;
 import com.mooo.sestus.indoor_locator.data.FloorPlan;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.SortedSet;
 
-/**
- * Created by mike on 5/27/17.
- */
 
 interface SelectFloorPlanContract {
 
@@ -20,7 +18,7 @@ interface SelectFloorPlanContract {
 
         void showErrorOnLoadingFloorPlans();
 
-        void updateFloorPlanList(SortedSet<FloorPlan> floorPlanList);
+        void updateFloorPlanList(Collection<FloorPlan> floorPlanList);
 
         void startViewFloorPlanActivity(String floorPlanId);
 
