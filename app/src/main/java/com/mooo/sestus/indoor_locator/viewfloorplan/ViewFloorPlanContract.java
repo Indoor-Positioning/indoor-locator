@@ -31,5 +31,7 @@ public interface ViewFloorPlanContract {
         void recordFingerprints(PointF pin);
 
         void onUserClickedFloorPlan(PointF pointF);
+
+        void scanSelectedPin();
     }
 }

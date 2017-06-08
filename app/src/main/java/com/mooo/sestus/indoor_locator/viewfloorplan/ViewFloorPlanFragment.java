@@ -1,6 +1,7 @@
 package com.mooo.sestus.indoor_locator.viewfloorplan;
 
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.mooo.sestus.indoor_locator.R;
+import com.mooo.sestus.indoor_locator.scan.MagneticScanActivity;
 
 import java.util.Collection;
 
@@ -29,6 +31,7 @@ public class ViewFloorPlanFragment extends Fragment implements ViewFloorPlanCont
     private String floorPlanId;
     private PinView floorPlanImage;
     private FloatingActionButton confirmPinFab;
+    private FloatingActionButton scanPointFab;
 
 
     public ViewFloorPlanFragment() {
@@ -51,18 +54,19 @@ public class ViewFloorPlanFragment extends Fragment implements ViewFloorPlanCont
                                           Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_view_floor_plan, container, false);
         floorPlanImage = (PinView) v.findViewById(R.id.imageView);
-        return v;
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
         confirmPinFab = (FloatingActionButton) getActivity().findViewById(R.id.fab_confirm);
+        scanPointFab = (FloatingActionButton) getActivity().findViewById(R.id.fab_scan_pin);
         confirmPinFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 presenter.onPinConfirmed();
                 confirmPinFab.setVisibility(GONE);
+            }
+        });
+        scanPointFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.scanSelectedPin();
             }
         });
         final GestureDetector gestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
@@ -82,6 +86,7 @@ public class ViewFloorPlanFragment extends Fragment implements ViewFloorPlanCont
                 return gestureDetector.onTouchEvent(event);
             }
         });
+        return v;
     }
 
     @Override
@@ -98,12 +103,16 @@ public class ViewFloorPlanFragment extends Fragment implements ViewFloorPlanCont
     @Override
     public void showConfirmAddPinToFloorPlan(PointF pin) {
         floorPlanImage.addNewPin(pin);
+        scanPointFab.setVisibility(View.GONE);
         confirmPinFab.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void showStartScanningActivity(String floorPlanId, int pinnedLocationId) {
-
+        Intent intent = new Intent(getContext(), MagneticScanActivity.class);
+        intent.putExtra(MagneticScanActivity.FLOOR_PLAN_ID, floorPlanId);
+        intent.putExtra(MagneticScanActivity.POINT_ID, pinnedLocationId);
+        startActivity(intent);
     }
 
     @Override
@@ -115,6 +124,7 @@ public class ViewFloorPlanFragment extends Fragment implements ViewFloorPlanCont
     public void showSelectedPin(PointF pin) {
         floorPlanImage.setSelectedPin(pin);
         confirmPinFab.setVisibility(View.GONE);
+        scanPointFab.setVisibility(View.VISIBLE);
     }
 
     @Override

@@ -23,4 +23,15 @@
         app:layout_anchorGravity="bottom|right|end"
         android:visibility="gone"/>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_scan_pin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_magnet_field"
+        app:fabSize="normal"
+        app:layout_anchor="@id/cont_view_floor_plan_fragment"
+        app:layout_anchorGravity="bottom|right|end"
+        android:visibility="gone"/>
+
 </android.support.design.widget.CoordinatorLayout>

@@ -12,6 +12,7 @@ import java.util.List;
 
 public class ViewFloorPlanPresenter implements ViewFloorPlanContract.Presenter {
 
+    private static final float CLOSE_DISTANCE_THRESHOLD = 120;
     private final FloorPlanRepository repository;
     private final ViewFloorPlanContract.View view;
     private volatile boolean isStopped;
@@ -71,10 +72,17 @@ public class ViewFloorPlanPresenter implements ViewFloorPlanContract.Presenter {
         }
     }
 
+    @Override
+    public void scanSelectedPin() {
+        if (selectedExistingPoint != null) {
+            view.showStartScanningActivity(floorPlan.getId(), repository.getPinId(floorPlan.getId(),selectedExistingPoint));
+        }
+    }
+
     private boolean areClose(PointF point, PointF nearestPoint) {
         float xDist = Math.abs(point.x - nearestPoint.x);
         float yDist = Math.abs(point.y - nearestPoint.y);
-        return xDist < 120 && yDist < 120;
+        return xDist < CLOSE_DISTANCE_THRESHOLD && yDist < CLOSE_DISTANCE_THRESHOLD;
     }
 
     private PointF findClosestPoint(PointF requestedPoint) {
