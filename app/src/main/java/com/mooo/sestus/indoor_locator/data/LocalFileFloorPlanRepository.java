@@ -72,6 +72,7 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
     public void addFloorPlan(final String floorPlanName, final Bitmap bitmap, final SaveFloorPlanCallback callback) {
         final FloorPlan floorPlan = new FloorPlan(floorPlanName, bitmap);
         floorPlanMap.put(floorPlanName, floorPlan);
+        callback.onFloorPlanSaved(floorPlan);
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
@@ -94,7 +95,6 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
                         e.printStackTrace();
                     }
                 }
-                callback.onFloorPlanSaved(floorPlan);
             }
         });
 

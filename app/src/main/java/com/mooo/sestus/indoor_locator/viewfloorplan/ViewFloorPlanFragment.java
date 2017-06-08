@@ -19,6 +19,8 @@ import com.mooo.sestus.indoor_locator.R;
 
 import java.util.Collection;
 
+import static android.view.View.GONE;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -60,7 +62,7 @@ public class ViewFloorPlanFragment extends Fragment implements ViewFloorPlanCont
             @Override
             public void onClick(View v) {
                 presenter.onPinConfirmed();
-                confirmPinFab.setVisibility(View.GONE);
+                confirmPinFab.setVisibility(GONE);
             }
         });
         final GestureDetector gestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
@@ -89,7 +91,7 @@ public class ViewFloorPlanFragment extends Fragment implements ViewFloorPlanCont
 
     @Override
     public void showFloorPlanImage(Bitmap bitmap, Collection<PointF> pinnedLocations) {
-        floorPlanImage.setImage(ImageSource.bitmap(bitmap));
+        floorPlanImage.setImage(ImageSource.cachedBitmap(bitmap));
         floorPlanImage.setPins(pinnedLocations);
     }
 
@@ -112,6 +114,7 @@ public class ViewFloorPlanFragment extends Fragment implements ViewFloorPlanCont
     @Override
     public void showSelectedPin(PointF pin) {
         floorPlanImage.setSelectedPin(pin);
+        confirmPinFab.setVisibility(View.GONE);
     }
 
     @Override
