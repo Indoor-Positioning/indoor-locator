@@ -15,7 +15,7 @@ public class DeviceSensorRepository implements SensorRepository, SensorEventList
     private static Sensor magneticSensorUncalibrated;
     private final float[] mAccelerometerReading = new float[3];
     private final float[] mMagnetometerReading = new float[3];
-    private final float[] measurements = new float[6];
+    private final float[] lastMeasurement = new float[6];
     private final float[] uncalibratedMagneticField = new float[3];
     private final float[] mRotationMatrix = new float[9];
     private final float[] mOrientationAngles = new float[3];
@@ -24,6 +24,7 @@ public class DeviceSensorRepository implements SensorRepository, SensorEventList
     private final Sensor magneticSensor;
     private final Sensor accelerometer;
     private Callback callbacks;
+    private final Object lock = new Object();
 
     public DeviceSensorRepository(Activity activity) {
         windowManager = activity.getWindowManager();
@@ -48,10 +49,11 @@ public class DeviceSensorRepository implements SensorRepository, SensorEventList
 
     @Override
     public float[] getMeasurement() {
-        System.arraycopy(uncalibratedMagneticField, 0, measurements, 0, 3);
-        System.arraycopy(mOrientationAngles, 0, measurements, 3, 3);
-
-        return measurements;
+        synchronized (lock) {
+            System.arraycopy(uncalibratedMagneticField, 0, lastMeasurement, 0, 3);
+            System.arraycopy(mOrientationAngles, 0, lastMeasurement, 3, 3);
+        }
+        return lastMeasurement;
     }
 
     public static SensorRepository getInstance(Activity activity) {
@@ -75,15 +77,19 @@ public class DeviceSensorRepository implements SensorRepository, SensorEventList
                     mAccelerometerReading, mMagnetometerReading);
             computeOrientation(mRotationMatrix);
             SensorManager.getOrientation(mRotationMatrix, mOrientationAngles);
-            for(int i = 0; i < 3; i++) {
-                mOrientationAngles[i] = (float)(Math.toDegrees(mOrientationAngles[i]));
+            synchronized (lock) {
+                for (int i = 0; i < 3; i++) {
+                    mOrientationAngles[i] = (float) (Math.toDegrees(mOrientationAngles[i]));
+                }
             }
             callbacks.onRotationSensorChanged(mOrientationAngles[0], mOrientationAngles[1], mOrientationAngles[2]);
         }
         else if (sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED) {
-            uncalibratedMagneticField[0] = event.values[0];
-            uncalibratedMagneticField[1] = event.values[1];
-            uncalibratedMagneticField[2] = event.values[2];
+            synchronized (lock) {
+                uncalibratedMagneticField[0] = event.values[0];
+                uncalibratedMagneticField[1] = event.values[1];
+                uncalibratedMagneticField[2] = event.values[2];
+            }
             callbacks.onMagneticSensorChanged(event.values[0], event.values[1], event.values[2]);
         }
 

@@ -1,18 +1,19 @@
-package com.mooo.sestus.indoor_locator.scan;
+package com.mooo.sestus.indoor_locator.locate;
 
+import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.MenuItem;
+
 import com.mooo.sestus.indoor_locator.Injection;
 import com.mooo.sestus.indoor_locator.R;
 
-public class MagneticScanActivity extends AppCompatActivity {
+public class LocateActivity extends AppCompatActivity {
 
     public static final String FLOOR_PLAN_ID = "FP_ID";
     public static final String POINT_ID = "POINT_ID";
-    public static final String MAGNETIC_SCAN_FRAGMENT = "LOCATE_FRAGMENT";
-    private MagneticScanContract.Presenter presenter;
+    public static final String LOCATE_FRAGMENT = "LOCATE_FRAGMENT";
+    private LocateContract.Presenter presenter;
 
 
     @Override
@@ -23,18 +24,17 @@ public class MagneticScanActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         String floorPlanId = getIntent().getStringExtra(FLOOR_PLAN_ID);
-        int pointId = getIntent().getIntExtra(POINT_ID, 0);
         FragmentManager fragManager = this.getSupportFragmentManager();
-        MagneticScanFragment fragment = (MagneticScanFragment) fragManager.findFragmentByTag(MAGNETIC_SCAN_FRAGMENT);
+        LocateFragment fragment = (LocateFragment) fragManager.findFragmentByTag(LOCATE_FRAGMENT);
 
         if (fragment == null) {
-            fragment = MagneticScanFragment.newInstance(floorPlanId, pointId);
+            fragment = LocateFragment.newInstance(floorPlanId);
         }
 
         fragManager.beginTransaction()
-                .replace(R.id.cont_magnetic_scan, fragment, MAGNETIC_SCAN_FRAGMENT)
+                .replace(R.id.cont_locate, fragment, LOCATE_FRAGMENT)
                 .commit();
-        presenter = new MagneticScanPresenter(Injection.provideFloorPlanRepository(this), Injection.provideSensorRepository(this), fragment, floorPlanId, pointId);
+        presenter = new LocatePresenter(Injection.provideFloorPlanRepository(this), Injection.provideSensorRepository(this), fragment, floorPlanId);
     }
 
     @Override

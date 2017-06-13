@@ -13,10 +13,12 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.mooo.sestus.indoor_locator.R;
+import com.mooo.sestus.indoor_locator.locate.LocateActivity;
 import com.mooo.sestus.indoor_locator.scan.MagneticScanActivity;
 
 import java.util.Collection;
@@ -56,6 +58,16 @@ public class ViewFloorPlanFragment extends Fragment implements ViewFloorPlanCont
         floorPlanImage = (PinView) v.findViewById(R.id.imageView);
         confirmPinFab = (FloatingActionButton) getActivity().findViewById(R.id.fab_confirm);
         scanPointFab = (FloatingActionButton) getActivity().findViewById(R.id.fab_scan_pin);
+        Button locateButton = (Button) v.findViewById(R.id.btn_select_floor_plan);
+        locateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), LocateActivity.class);
+                intent.putExtra(MagneticScanActivity.FLOOR_PLAN_ID, floorPlanId);
+                startActivity(intent);
+            }
+        });
+
         confirmPinFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

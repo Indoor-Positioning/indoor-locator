@@ -21,4 +21,6 @@
     <string name="rotation_x">Rotation (X axis)</string>
     <string name="rotation_z">Rotation (Z axis)</string>
     <string name="rotation_y">Rotation (Y axis)</string>
+    <string name="located_point">located point</string>
+    <string name="locate">locate</string>
 </resources>

@@ -1,38 +1,35 @@
-package com.mooo.sestus.indoor_locator.scan;
+package com.mooo.sestus.indoor_locator.locate;
 
 import com.mooo.sestus.indoor_locator.data.FloorPlanRepository;
 import com.mooo.sestus.indoor_locator.data.SensorRepository;
+import com.mooo.sestus.indoor_locator.scan.MagneticScanPresenter;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-public class MagneticScanPresenter implements MagneticScanContract.Presenter, SensorRepository.Callback {
+public class LocatePresenter implements LocateContract.Presenter, SensorRepository.Callback {
     private final SensorRepository sensorRepository;
-    private final MagneticScanContract.View view;
-    private final Runnable recordingRunnable;
+    private final LocateContract.View view;
     private final FloorPlanRepository floorPlanRepository;
-    private final int pointId;
-    private final String floorPlanId;
-    private ScheduledFuture scheduledRecordingTask;
+    private final Runnable locateRunnalbe;
     private ScheduledExecutorService scheduler;
-    private int measurementCount = 0;
-    private float[] newMeasurement = new float[6];
-    private int fingerPrintsAdded = 0;
+    private ScheduledFuture scheduledRecordingTask;
 
-    public MagneticScanPresenter(final FloorPlanRepository floorPlanRepository, final SensorRepository sensorRepository,
-                                 MagneticScanContract.View view, final String floorPlanId, final int pointId) {
+
+    public LocatePresenter(final FloorPlanRepository floorPlanRepository, final SensorRepository sensorRepository,
+                           final LocateContract.View view, final String floorPlanId) {
         this.sensorRepository = sensorRepository;
         this.floorPlanRepository = floorPlanRepository;
         this.view = view;
-        this.floorPlanId = floorPlanId;
-        this.pointId = pointId;
-        this.recordingRunnable = new Runnable() {
+        this.locateRunnalbe = new Runnable() {
             @Override
             public void run() {
-                float[] measurements = MagneticScanPresenter.this.sensorRepository.getMeasurement();
-                processMeasurement(measurements);
+                float[] measurements = LocatePresenter.this.sensorRepository.getMeasurement();
+                int closest = floorPlanRepository.getClosestPoint(measurements, floorPlanId);
+                view.showLocatedPointId(closest);
+
             }
         };
         view.setPresenter(this);
@@ -43,6 +40,7 @@ public class MagneticScanPresenter implements MagneticScanContract.Presenter, Se
         if (scheduler.isShutdown())
             scheduler = Executors.newScheduledThreadPool(1);
         sensorRepository.register(this);
+        scheduledRecordingTask = scheduler.scheduleWithFixedDelay(locateRunnalbe, 600, 130, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -53,14 +51,11 @@ public class MagneticScanPresenter implements MagneticScanContract.Presenter, Se
 
     @Override
     public void startRecording() {
-        fingerPrintsAdded = 0;
-        scheduledRecordingTask = scheduler.scheduleWithFixedDelay(recordingRunnable, 500, 100, TimeUnit.MILLISECONDS);
     }
 
     @Override
     public void stopRecording() {
         scheduledRecordingTask.cancel(true);
-        view.showAddedFingerPrints(fingerPrintsAdded);
     }
 
     @Override
@@ -87,17 +82,4 @@ public class MagneticScanPresenter implements MagneticScanContract.Presenter, Se
         view.updateRoll(roll);
     }
 
-    private void processMeasurement(float[] measurement) {
-        measurementCount++;
-        for (int i = 0; i < measurement.length; i++) {
-            newMeasurement[i] += measurement[i];
-            if (measurementCount == 5)
-                newMeasurement[i] /= 5;
-        }
-        if (measurementCount == 5) {
-            floorPlanRepository.addFingerPrint(floorPlanId, pointId, newMeasurement);
-            fingerPrintsAdded++;
-            measurementCount = 0;
-        }
-    }
 }

@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.PointF;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.mooo.sestus.indoor_locator.utils.CsvUtils;
 
@@ -18,11 +19,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TreeMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -127,7 +130,10 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
     public int getClosestPoint(float[] measurement, String floorPlanId) {
         int distance = Integer.MAX_VALUE;
         int pointId = 0;
-        for (Map.Entry<Integer, List<Float[]>> entry : fingerPrints.get(floorPlanId).entrySet()) {
+        Set<Map.Entry<Integer, List<Float[]>>> entrySet = fingerPrints.get(floorPlanId).entrySet();
+        Log.v("LOCATE", String.format("Locating fingerprint %s on %d points", Arrays.toString(measurement), entrySet.size()));
+        for (Map.Entry<Integer, List<Float[]>> entry : entrySet) {
+            Log.v("LOCATE", String.format("Trying Point %d which has %d fingerprints", entry.getKey(), entry.getValue().size()));
             for (Float[] fingerprint: entry.getValue()) {
                 int newDistance = computeDistance(fingerprint, measurement);
                 if (newDistance < distance) {

@@ -11,6 +11,17 @@
             android:layout_marginBottom="30dp"
             android:layout_marginTop="10dp"/>
 
+        <Button
+            style="@style/Button.Flat.Primary"
+            android:id="@+id/btn_locate"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="@string/locate"
+            android:layout_marginTop="16dp"
+            android:layout_below="@id/imageView"
+            android:layout_centerHorizontal="true"/>
+
+
         <TextView
             android:id="@+id/note"
             android:layout_height="wrap_content"
