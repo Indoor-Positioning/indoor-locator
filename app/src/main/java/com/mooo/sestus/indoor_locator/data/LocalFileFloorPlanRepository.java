@@ -8,36 +8,32 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
 import com.mooo.sestus.indoor_locator.utils.CsvUtils;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
 
-import java.io.BufferedReader;
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
-import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class LocalFileFloorPlanRepository implements FloorPlanRepository {
     private static LocalFileFloorPlanRepository INSTANCE;
     private final File appDir;
-    private TreeMap<String, FloorPlan> floorPlanMap;
-    private HashMap<String, List<PointF>> floorPlanPoints;
-    private HashMap<String, Properties> propertiesMap;
+    private Map<String, FloorPlan> floorPlanMap;
+    private Map<String, Map<Integer, List<Float[]>>> fingerPrints = new HashMap<>();
+    private Map<String, List<PointF>> floorPlanPoints;
+    private Map<String, Properties> propertiesMap;
 
     private LocalFileFloorPlanRepository(@NonNull Context context) {
         appDir = context.getFilesDir();
@@ -64,8 +60,8 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
     }
 
     @Override
-    public int getPinId(String floorplanId, PointF point) {
-        return floorPlanPoints.get(floorplanId).indexOf(point);
+    public int getPinId(String floorPlanId, PointF point) {
+        return floorPlanPoints.get(floorPlanId).indexOf(point);
     }
 
     @Override
@@ -108,6 +104,47 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
     @Override
     public FloorPlan getFloorPlanById(String floorPlanId) {
         return floorPlanMap.get(floorPlanId);
+    }
+
+    @Override
+    public void addFingerPrint(String floorPlanId, int pointId, float[] measurement) {
+        Map<Integer, List<Float[]>> floorPlanEntry = fingerPrints.get(floorPlanId);
+        if (floorPlanEntry == null) {
+            floorPlanEntry = new HashMap<>();
+            fingerPrints.put(floorPlanId, floorPlanEntry);
+            List<Float[]> values = new ArrayList<>();
+            floorPlanEntry.put(pointId, values);
+        }
+        List<Float[]> values = floorPlanEntry.get(pointId);
+        if (values == null) {
+            values = new ArrayList<>();
+            floorPlanEntry.put(pointId,values);
+        }
+        values.add(ArrayUtils.toObject(measurement));
+    }
+
+    @Override
+    public int getClosestPoint(float[] measurement, String floorPlanId) {
+        int distance = Integer.MAX_VALUE;
+        int pointId = 0;
+        for (Map.Entry<Integer, List<Float[]>> entry : fingerPrints.get(floorPlanId).entrySet()) {
+            for (Float[] fingerprint: entry.getValue()) {
+                int newDistance = computeDistance(fingerprint, measurement);
+                if (newDistance < distance) {
+                    distance = newDistance;
+                    pointId = entry.getKey();
+                }
+            }
+        }
+        return pointId;
+    }
+
+    private int computeDistance(Float[] fingerprint, float[] measurement) {
+        float distance = 0;
+        for (int i = 0; i < fingerprint.length; i++) {
+            distance += Math.abs(fingerprint[i] - measurement[i]);
+        }
+        return (int) distance;
     }
 
     @Override

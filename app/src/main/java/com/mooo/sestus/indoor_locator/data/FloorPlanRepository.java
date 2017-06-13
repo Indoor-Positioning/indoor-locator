@@ -27,6 +27,8 @@ public interface FloorPlanRepository {
 
     FloorPlan getFloorPlanById(String floorPlanId);
 
+    void addFingerPrint(String floorPlanId, int pointId, float[] measurements);
+
     interface SaveFloorPlanCallback {
         void onFloorPlanSaved(FloorPlan floorPlan);
 
@@ -38,6 +40,9 @@ public interface FloorPlanRepository {
 
         void onDataNotAvailable();
     }
+
+
+    int getClosestPoint(float[] fingerprint, String floorPlanId);
 
     void getFloorPlans(@NonNull LoadFloorPlansCallback callback);
 }

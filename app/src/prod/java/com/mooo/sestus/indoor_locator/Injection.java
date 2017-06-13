@@ -16,10 +16,14 @@
 
 package com.mooo.sestus.indoor_locator;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
+
+import com.mooo.sestus.indoor_locator.data.DeviceSensorRepository;
 import com.mooo.sestus.indoor_locator.data.FloorPlanRepository;
 import com.mooo.sestus.indoor_locator.data.LocalFileFloorPlanRepository;
+import com.mooo.sestus.indoor_locator.data.SensorRepository;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -29,5 +33,9 @@ public class Injection {
     public static FloorPlanRepository provideFloorPlanRepository(@NonNull Context context) {
         checkNotNull(context);
         return LocalFileFloorPlanRepository.getInstance(context);
+    }
+
+    public static SensorRepository provideSensorRepository(@NonNull Activity activity) {
+        return DeviceSensorRepository.getInstance(activity);
     }
 }

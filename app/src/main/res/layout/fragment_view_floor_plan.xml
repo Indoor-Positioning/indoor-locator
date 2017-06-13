@@ -1,7 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/content"
     android:layout_width="match_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent"
+    android:background="@color/primary">
 
         <com.mooo.sestus.indoor_locator.viewfloorplan.PinView
             android:id="@+id/imageView"
@@ -17,6 +18,6 @@
             android:text="Touch Image to start recording on Location"
             android:gravity="center_horizontal"
             android:textSize="14sp"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:layout_below="@id/imageView"/>
 </RelativeLayout>

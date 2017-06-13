@@ -15,4 +15,10 @@
     <string name="header_wellcome">Wellcome to Indoor Locator</string>
     <string name="no_floor_plans"><![CDATA[<No Floor Plans available>]]></string>
     <string name="select_image">Select image</string>
+    <string name="magnetic_x">Magnetic field (x)</string>
+    <string name="magnetic_y">Magnetic field (y)</string>
+    <string name="magnetic_z">Magnetic field (z)</string>
+    <string name="rotation_x">Rotation (X axis)</string>
+    <string name="rotation_z">Rotation (Z axis)</string>
+    <string name="rotation_y">Rotation (Y axis)</string>
 </resources>
