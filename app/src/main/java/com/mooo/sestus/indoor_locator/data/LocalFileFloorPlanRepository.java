@@ -130,6 +130,8 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
     public int getClosestPoint(float[] measurement, String floorPlanId) {
         int distance = Integer.MAX_VALUE;
         int pointId = 0;
+        if (fingerPrints.get(floorPlanId) == null)
+            return -1;
         Set<Map.Entry<Integer, List<Float[]>>> entrySet = fingerPrints.get(floorPlanId).entrySet();
         Log.v("LOCATE", String.format("Locating fingerprint %s on %d points", Arrays.toString(measurement), entrySet.size()));
         for (Map.Entry<Integer, List<Float[]>> entry : entrySet) {
@@ -147,8 +149,11 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
 
     private int computeDistance(Float[] fingerprint, float[] measurement) {
         float distance = 0;
-        for (int i = 0; i < fingerprint.length; i++) {
+        for (int i = 0; i < 3; i++) {
             distance += Math.abs(fingerprint[i] - measurement[i]);
+        }
+        for (int i = 3; i < fingerprint.length; i++) {
+            distance += 0.1 * Math.abs(fingerprint[i] - measurement[i]);
         }
         return (int) distance;
     }

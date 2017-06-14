@@ -58,12 +58,12 @@ public class ViewFloorPlanFragment extends Fragment implements ViewFloorPlanCont
         floorPlanImage = (PinView) v.findViewById(R.id.imageView);
         confirmPinFab = (FloatingActionButton) getActivity().findViewById(R.id.fab_confirm);
         scanPointFab = (FloatingActionButton) getActivity().findViewById(R.id.fab_scan_pin);
-        Button locateButton = (Button) v.findViewById(R.id.btn_select_floor_plan);
+        Button locateButton = (Button) v.findViewById(R.id.btn_locate);
         locateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), LocateActivity.class);
-                intent.putExtra(MagneticScanActivity.FLOOR_PLAN_ID, floorPlanId);
+                intent.putExtra(LocateActivity.FLOOR_PLAN_ID, floorPlanId);
                 startActivity(intent);
             }
         });

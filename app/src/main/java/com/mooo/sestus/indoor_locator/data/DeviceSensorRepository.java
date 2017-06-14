@@ -102,24 +102,20 @@ public class DeviceSensorRepository implements SensorRepository, SensorEventList
         int axisY = 0;
         switch (rotation) {
             case Surface.ROTATION_0:
-                Log.v("SurfaceRemap", "0 degree");
                 axisX = SensorManager.AXIS_X;// is this valid?
                 axisY = SensorManager.AXIS_Y;// is this valid?
                 break;
 
             case Surface.ROTATION_90:
-                Log.v("SurfaceRemap", "90 degree");
                 // examples says remapCoordinateSystem(inR, AXIS_Y, AXIS_MINUS_X, outR);
                 axisX = SensorManager.AXIS_Y;
                 axisY = SensorManager.AXIS_MINUS_X;
                 break;
 
             case Surface.ROTATION_180:
-                Log.v("SurfaceRemap", "180 degree");
                 break;
 
             case Surface.ROTATION_270:
-                Log.v("SurfaceRemap", "270 degree");
                 break;
 
             default:

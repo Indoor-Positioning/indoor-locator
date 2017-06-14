@@ -28,7 +28,11 @@ public class LocatePresenter implements LocateContract.Presenter, SensorReposito
             public void run() {
                 float[] measurements = LocatePresenter.this.sensorRepository.getMeasurement();
                 int closest = floorPlanRepository.getClosestPoint(measurements, floorPlanId);
-                view.showLocatedPointId(closest);
+                if (closest == -1) {
+                    //no fingerprints for this floor plan
+                }
+                else
+                    view.showLocatedPointId(closest);
 
             }
         };
@@ -37,10 +41,10 @@ public class LocatePresenter implements LocateContract.Presenter, SensorReposito
 
     @Override
     public void start() {
-        if (scheduler.isShutdown())
+        if (scheduler == null || scheduler.isShutdown())
             scheduler = Executors.newScheduledThreadPool(1);
         sensorRepository.register(this);
-        scheduledRecordingTask = scheduler.scheduleWithFixedDelay(locateRunnalbe, 600, 130, TimeUnit.MILLISECONDS);
+        scheduledRecordingTask = scheduler.scheduleWithFixedDelay(locateRunnalbe, 400, 950, TimeUnit.MILLISECONDS);
     }
 
     @Override

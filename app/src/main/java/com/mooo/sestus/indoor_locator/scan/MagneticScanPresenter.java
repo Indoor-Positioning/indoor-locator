@@ -40,7 +40,7 @@ public class MagneticScanPresenter implements MagneticScanContract.Presenter, Se
 
     @Override
     public void start() {
-        if (scheduler.isShutdown())
+        if (scheduler == null || scheduler.isShutdown())
             scheduler = Executors.newScheduledThreadPool(1);
         sensorRepository.register(this);
     }

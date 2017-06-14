@@ -21,6 +21,7 @@
         <activity android:name=".addfloorplan.AddFloorPlanActivity" />
         <activity android:name=".viewfloorplan.ViewFloorPlanActivity" />
         <activity android:name=".scan.MagneticScanActivity"></activity>
+        <activity android:name=".locate.LocateActivity"></activity>
     </application>
 
 </manifest>

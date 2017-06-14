@@ -11,7 +11,6 @@ import com.mooo.sestus.indoor_locator.R;
 public class LocateActivity extends AppCompatActivity {
 
     public static final String FLOOR_PLAN_ID = "FP_ID";
-    public static final String POINT_ID = "POINT_ID";
     public static final String LOCATE_FRAGMENT = "LOCATE_FRAGMENT";
     private LocateContract.Presenter presenter;
 
@@ -19,7 +18,7 @@ public class LocateActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_magnetic_scan);
+        setContentView(R.layout.activity_locate);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
