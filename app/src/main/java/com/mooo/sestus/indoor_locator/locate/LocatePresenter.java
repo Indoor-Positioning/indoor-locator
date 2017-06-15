@@ -2,8 +2,10 @@ package com.mooo.sestus.indoor_locator.locate;
 
 import com.mooo.sestus.indoor_locator.data.FloorPlanRepository;
 import com.mooo.sestus.indoor_locator.data.SensorRepository;
-import com.mooo.sestus.indoor_locator.scan.MagneticScanPresenter;
 
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -13,9 +15,11 @@ public class LocatePresenter implements LocateContract.Presenter, SensorReposito
     private final SensorRepository sensorRepository;
     private final LocateContract.View view;
     private final FloorPlanRepository floorPlanRepository;
-    private final Runnable locateRunnalbe;
+    private final Runnable locateRunnable;
     private ScheduledExecutorService scheduler;
     private ScheduledFuture scheduledRecordingTask;
+    private float[] averageMeasurement = new float[6];
+    private int samplesCollected;
 
 
     public LocatePresenter(final FloorPlanRepository floorPlanRepository, final SensorRepository sensorRepository,
@@ -23,20 +27,30 @@ public class LocatePresenter implements LocateContract.Presenter, SensorReposito
         this.sensorRepository = sensorRepository;
         this.floorPlanRepository = floorPlanRepository;
         this.view = view;
-        this.locateRunnalbe = new Runnable() {
+        this.locateRunnable = new Runnable() {
             @Override
             public void run() {
                 float[] measurements = LocatePresenter.this.sensorRepository.getMeasurement();
-                int closest = floorPlanRepository.getClosestPoint(measurements, floorPlanId);
-                if (closest == -1) {
-                    //no fingerprints for this floor plan
+                averageMeasurement = ArrayUtils.addAll(measurements, averageMeasurement);
+                if (++samplesCollected == 5) {
+                    divideArrayBy(5, averageMeasurement);
+                    int closest = floorPlanRepository.getClosestPoint(measurements, floorPlanId);
+                    if (closest == -1) {
+                        //no fingerprints for this floor plan
+                    } else
+                        view.showLocatedPointId(closest);
+                    samplesCollected = 0;
+                    Arrays.fill(averageMeasurement, 0f);
                 }
-                else
-                    view.showLocatedPointId(closest);
 
             }
         };
         view.setPresenter(this);
+    }
+
+    private void divideArrayBy(int divider, float[] averageMeasurement) {
+        for (int i = 0; i<averageMeasurement.length; i++)
+            averageMeasurement[i] /= divider;
     }
 
     @Override
@@ -44,7 +58,7 @@ public class LocatePresenter implements LocateContract.Presenter, SensorReposito
         if (scheduler == null || scheduler.isShutdown())
             scheduler = Executors.newScheduledThreadPool(1);
         sensorRepository.register(this);
-        scheduledRecordingTask = scheduler.scheduleWithFixedDelay(locateRunnalbe, 400, 950, TimeUnit.MILLISECONDS);
+        scheduledRecordingTask = scheduler.scheduleWithFixedDelay(locateRunnable, 400, 200, TimeUnit.MILLISECONDS);
     }
 
     @Override

@@ -42,6 +42,8 @@ public interface FloorPlanRepository {
     }
 
 
+    void saveFingerPrints(String floorPlanId, int pointId);
+
     int getClosestPoint(float[] fingerprint, String floorPlanId);
 
     void getFloorPlans(@NonNull LoadFloorPlansCallback callback);

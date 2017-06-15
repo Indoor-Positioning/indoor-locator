@@ -60,6 +60,7 @@ public class MagneticScanPresenter implements MagneticScanContract.Presenter, Se
     @Override
     public void stopRecording() {
         scheduledRecordingTask.cancel(true);
+        floorPlanRepository.saveFingerPrints(floorPlanId, pointId);
         view.showAddedFingerPrints(fingerPrintsAdded);
     }
 

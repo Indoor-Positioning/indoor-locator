@@ -127,24 +127,48 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
     }
 
     @Override
+    public void saveFingerPrints(String floorPlanId, int pointId) {
+        List<Float[]> values = fingerPrints.get(floorPlanId).get(pointId);
+        CsvUtils.saveFingerPrintsToCsv(propertiesMap.get(floorPlanId).getProperty("fingerPrintsPath"), pointId, values);
+    }
+
+    @Override
     public int getClosestPoint(float[] measurement, String floorPlanId) {
-        int distance = Integer.MAX_VALUE;
-        int pointId = 0;
         if (fingerPrints.get(floorPlanId) == null)
             return -1;
         Set<Map.Entry<Integer, List<Float[]>>> entrySet = fingerPrints.get(floorPlanId).entrySet();
+        Map<Integer, List<Integer>> distances = new HashMap<>();
         Log.v("LOCATE", String.format("Locating fingerprint %s on %d points", Arrays.toString(measurement), entrySet.size()));
         for (Map.Entry<Integer, List<Float[]>> entry : entrySet) {
+            List<Integer> pointDistances = new ArrayList<>(entry.getValue().size());
+            distances.put(entry.getKey(), pointDistances);
             Log.v("LOCATE", String.format("Trying Point %d which has %d fingerprints", entry.getKey(), entry.getValue().size()));
             for (Float[] fingerprint: entry.getValue()) {
                 int newDistance = computeDistance(fingerprint, measurement);
-                if (newDistance < distance) {
-                    distance = newDistance;
-                    pointId = entry.getKey();
-                }
+                pointDistances.add(newDistance);
             }
         }
-        return pointId;
+
+        return computeClosestPoint(distances);
+    }
+
+    private int computeClosestPoint(Map<Integer, List<Integer>> distances) {
+        int minSumOfFiveDistance = Integer.MAX_VALUE;
+        int closestPoint = -1;
+        for (Map.Entry<Integer, List<Integer>> entry : distances.entrySet()) {
+            List<Integer> pointDistances = entry.getValue();
+            Collections.sort(pointDistances);
+            int pointMinOfFiveSum = 0;
+            for (int i = 0; i < 5; i++)
+                pointMinOfFiveSum += pointDistances.get(i);
+            if (pointMinOfFiveSum < minSumOfFiveDistance) {
+                minSumOfFiveDistance = pointMinOfFiveSum;
+                closestPoint = entry.getKey();
+            }
+        }
+        if (minSumOfFiveDistance >= 100)
+            return -1;
+        return closestPoint;
     }
 
     private int computeDistance(Float[] fingerprint, float[] measurement) {
@@ -152,9 +176,7 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
         for (int i = 0; i < 3; i++) {
             distance += Math.abs(fingerprint[i] - measurement[i]);
         }
-        for (int i = 3; i < fingerprint.length; i++) {
-            distance += 0.1 * Math.abs(fingerprint[i] - measurement[i]);
-        }
+        distance += 0.6 * Math.abs(fingerprint[3] - measurement[3]);
         return (int) distance;
     }
 
@@ -190,10 +212,14 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
                     String name = floorPlanProps.getProperty("name");
                     String imagePath = floorPlanProps.getProperty("imagePath");
                     String pointsPath = floorPlanProps.getProperty("pointsPath");
+                    String fingerPrintsPath = floorPlanProps.getProperty("fingerPrintsPath");
                     propertiesMap.put(name, floorPlanProps);
                     if (pointsPath != null && new File(pointsPath).exists()) {
-                        List<PointF> points = CsvUtils.readCsv(new File(pointsPath));
+                        List<PointF> points = CsvUtils.loadFloorPlanFromCsv(new File(pointsPath));
                         floorPlanPoints.put(name, points);
+                    }
+                    if (fingerPrintsPath!= null && new File(fingerPrintsPath).exists()) {
+                        fingerPrints.put(name, CsvUtils.loadFingerPrintsFromCsv(new File(fingerPrintsPath)));
                     }
                     File imageFile = new File(imagePath);
                     Bitmap image = null;
@@ -211,14 +237,17 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
 
     private void setProperties(Properties properties, String floorPlanName) {
         String imageFileName = "img_" + floorPlanName + ".png";
-        String pointsFileName = "points_" + floorPlanName + ".txt";
+        String pointsFileName = "points_" + floorPlanName + ".csv";
+        String fingerPrintsFileName = "fingerprints_" + floorPlanName + ".csv";
         String floorPlanPropsFile = floorPlanName + ".properties";
         File imagePath = new File(appDir, imageFileName);
         File pointsPath = new File(appDir, pointsFileName);
         File propsPath = new File(appDir, floorPlanPropsFile);
+        File fingerPrintsPath = new File(appDir, fingerPrintsFileName);
         properties.setProperty("name", floorPlanName);
         properties.setProperty("imagePath", imagePath.getAbsolutePath());
         properties.setProperty("pointsPath", pointsPath.getAbsolutePath());
+        properties.setProperty("fingerPrintsPath", fingerPrintsPath.getAbsolutePath());
         try {
             FileOutputStream out = new FileOutputStream(propsPath);
             properties.store(out, "Floor Plan Properties");
