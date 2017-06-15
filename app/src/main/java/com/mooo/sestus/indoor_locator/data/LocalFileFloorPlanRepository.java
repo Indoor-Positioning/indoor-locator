@@ -37,6 +37,7 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
     private Map<String, Map<Integer, List<Float[]>>> fingerPrints = new HashMap<>();
     private Map<String, List<PointF>> floorPlanPoints;
     private Map<String, Properties> propertiesMap;
+    private int lastComputedDistance;
 
     private LocalFileFloorPlanRepository(@NonNull Context context) {
         appDir = context.getFilesDir();
@@ -137,19 +138,21 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
         if (fingerPrints.get(floorPlanId) == null)
             return -1;
         Set<Map.Entry<Integer, List<Float[]>>> entrySet = fingerPrints.get(floorPlanId).entrySet();
-        Map<Integer, List<Integer>> distances = new HashMap<>();
+        int distance = Integer.MAX_VALUE;
+        int pointId = 0;
         Log.v("LOCATE", String.format("Locating fingerprint %s on %d points", Arrays.toString(measurement), entrySet.size()));
         for (Map.Entry<Integer, List<Float[]>> entry : entrySet) {
-            List<Integer> pointDistances = new ArrayList<>(entry.getValue().size());
-            distances.put(entry.getKey(), pointDistances);
             Log.v("LOCATE", String.format("Trying Point %d which has %d fingerprints", entry.getKey(), entry.getValue().size()));
             for (Float[] fingerprint: entry.getValue()) {
                 int newDistance = computeDistance(fingerprint, measurement);
-                pointDistances.add(newDistance);
+                if (newDistance < distance) {
+                    distance = newDistance;
+                    pointId = entry.getKey();
+                }
             }
         }
-
-        return computeClosestPoint(distances);
+        lastComputedDistance = distance;
+        return pointId;
     }
 
     private int computeClosestPoint(Map<Integer, List<Integer>> distances) {
@@ -173,12 +176,19 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
 
     private int computeDistance(Float[] fingerprint, float[] measurement) {
         float distance = 0;
+        //magnetic field
         for (int i = 0; i < 3; i++) {
             distance += Math.abs(fingerprint[i] - measurement[i]);
         }
+        //"orientation" - not very accurate
+        for (int i = 3; i < 6; i++) {
+            distance += 0.2 * Math.abs(fingerprint[i] - measurement[i]);
+        }
+
+        //wifi rssi
         distance += Math.abs(fingerprint[3] - measurement[3]);
         if (!fingerprint[6].equals(0f) && measurement[6] != 0)
-            distance += Math.abs(fingerprint[6] - measurement[6]);
+            distance += 4 * Math.abs(fingerprint[6] - measurement[6]);
         return (int) distance;
     }
 
@@ -194,6 +204,11 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
             });
         else
             callback.onFloorPlansLoaded(floorPlanMap.values());
+    }
+
+    @Override
+    public int getLastComputedDistance() {
+        return lastComputedDistance;
     }
 
     private void reloadFloorPlans() {

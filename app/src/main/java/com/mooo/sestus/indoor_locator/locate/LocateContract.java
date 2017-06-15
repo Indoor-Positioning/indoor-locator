@@ -11,6 +11,8 @@ public interface LocateContract {
     interface View extends BaseView<Presenter> {
         void showLocatedPointId(PointF point);
 
+        void showDistance(String pointDistance);
+
         void showFloorPlanImage(Bitmap image);
     }
 

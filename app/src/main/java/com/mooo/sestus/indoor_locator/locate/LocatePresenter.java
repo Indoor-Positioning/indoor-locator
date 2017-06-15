@@ -6,6 +6,8 @@ import com.mooo.sestus.indoor_locator.data.SensorRepository;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -21,6 +23,9 @@ public class LocatePresenter implements LocateContract.Presenter {
     private ScheduledFuture scheduledRecordingTask;
     private float[] averageMeasurement = new float[7];
     private int samplesCollected;
+    private LinkedList<Integer> lastResolvedLocations = new LinkedList<>();
+    private int lastResolvedPoint = -1;
+    private HashMap<Integer, Integer> locationOccurences = new HashMap<>();
 
 
     public LocatePresenter(final FloorPlanRepository floorPlanRepository, final SensorRepository sensorRepository,
@@ -36,11 +41,22 @@ public class LocatePresenter implements LocateContract.Presenter {
                 averageMeasurement = ArrayUtils.addAll(measurements, averageMeasurement);
                 if (++samplesCollected == 5) {
                     divideArrayBy(5, averageMeasurement);
-                    int closest = floorPlanRepository.getClosestPoint(measurements, floorPlanId);
-                    if (closest == -1) {
-                        //no fingerprints for this floor plan
-                    } else
-                        view.showLocatedPointId(floorPlanRepository.getFloorPlanPoints(floorPlanId).get(closest));
+                    int closestPoint = floorPlanRepository.getClosestPoint(measurements, floorPlanId);
+                    float distance = floorPlanRepository.getLastComputedDistance();
+                    if (distance >= 24) {
+                        view.showDistance(String.format("Point: %d\n Dist: %.2f", closestPoint, distance));
+                    } else {
+                        addResolvedLocation(closestPoint);
+                        int resolvedPoint = getResolvedPoint();
+                        if (resolvedPoint != lastResolvedPoint) {
+                            lastResolvedPoint = resolvedPoint;
+                            view.showLocatedPointId(floorPlanRepository.getFloorPlanPoints(floorPlanId).get(lastResolvedPoint));
+                            view.showDistance(String.format("Point: %d\n Dist: %.2f", closestPoint, distance));
+                        }
+                        else {
+                            view.showDistance(String.format("Point: %d\n Dist: %.2f", closestPoint, distance));
+                        }
+                    }
                     samplesCollected = 0;
                     Arrays.fill(averageMeasurement, 0f);
                 }
@@ -48,6 +64,13 @@ public class LocatePresenter implements LocateContract.Presenter {
             }
         };
         view.setPresenter(this);
+    }
+
+    private void addResolvedLocation(int closestPoint) {
+        if (lastResolvedLocations.size() >= 5) {
+            lastResolvedLocations.removeFirst();
+        }
+        lastResolvedLocations.add(closestPoint);
     }
 
     private void divideArrayBy(int divider, float[] averageMeasurement) {
@@ -79,4 +102,22 @@ public class LocatePresenter implements LocateContract.Presenter {
         scheduledRecordingTask.cancel(true);
     }
 
+    private int getResolvedPoint() {
+        locationOccurences.clear();
+        int point = -1;
+        int maxFreq = Integer.MIN_VALUE;
+        for (int pointId : lastResolvedLocations) {
+            if (locationOccurences.get(pointId) == null)
+                locationOccurences.put(pointId, 1);
+            else {
+                int freq = locationOccurences.get(pointId) + 1;
+                locationOccurences.put(pointId, freq);
+                if (freq > maxFreq) {
+                    maxFreq = freq;
+                    point = pointId;
+                }
+            }
+        }
+        return point;
+    }
 }

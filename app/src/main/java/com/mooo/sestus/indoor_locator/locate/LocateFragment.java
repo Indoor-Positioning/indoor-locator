@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.mooo.sestus.indoor_locator.R;
@@ -25,6 +26,7 @@ public class LocateFragment extends Fragment implements LocateContract.View {
 
     private LocateContract.Presenter presenter;
     private PinView floorPlanImage;
+    private TextView distanceTextView;
 
 
     public LocateFragment() {
@@ -54,6 +56,8 @@ public class LocateFragment extends Fragment implements LocateContract.View {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_locate, container, false);
         floorPlanImage = (PinView) v.findViewById(R.id.imageView);
+        distanceTextView = (TextView) v.findViewById(R.id.lbl_distance_val);
+
         return v;
     }
 
@@ -74,6 +78,15 @@ public class LocateFragment extends Fragment implements LocateContract.View {
     }
 
     @Override
+    public void showDistance(final String poindDistance) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                distanceTextView.setText(poindDistance);
+            }
+        });;
+
+    }
     public void showFloorPlanImage(Bitmap image) {
         floorPlanImage.setImage(ImageSource.cachedBitmap(image));
     }

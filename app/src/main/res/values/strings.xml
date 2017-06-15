@@ -24,4 +24,5 @@
     <string name="located_point">located point</string>
     <string name="locate">locate</string>
     <string name="rssi">rssi</string>
+    <string name="distance">distance</string>
 </resources>

@@ -29,6 +29,8 @@ public interface FloorPlanRepository {
 
     void addFingerPrint(String floorPlanId, int pointId, float[] measurements);
 
+    int getLastComputedDistance();
+
     interface SaveFloorPlanCallback {
         void onFloorPlanSaved(FloorPlan floorPlan);
 
