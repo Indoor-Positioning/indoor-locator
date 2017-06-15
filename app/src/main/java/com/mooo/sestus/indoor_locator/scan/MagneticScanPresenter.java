@@ -18,7 +18,7 @@ public class MagneticScanPresenter implements MagneticScanContract.Presenter, Se
     private ScheduledFuture scheduledRecordingTask;
     private ScheduledExecutorService scheduler;
     private int measurementCount = 0;
-    private float[] newMeasurement = new float[6];
+    private float[] newMeasurement = new float[7];
     private int fingerPrintsAdded = 0;
 
     public MagneticScanPresenter(final FloorPlanRepository floorPlanRepository, final SensorRepository sensorRepository,
@@ -82,10 +82,11 @@ public class MagneticScanPresenter implements MagneticScanContract.Presenter, Se
     }
 
     @Override
-    public void onRotationSensorChanged(float azimuth, float pitch, float roll) {
+    public void onRotationSensorChanged(float azimuth, float pitch, float roll, float wifiRssi) {
         view.updateAzimuth(azimuth);
         view.updatePitch(pitch);
         view.updateRoll(roll);
+        view.updateRssi(wifiRssi);
     }
 
     private void processMeasurement(float[] measurement) {

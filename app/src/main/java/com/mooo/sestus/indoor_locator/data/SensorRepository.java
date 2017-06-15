@@ -16,6 +16,6 @@ public interface SensorRepository {
 
         void onMagneticSensorChanged(float x, float y, float z);
 
-        void onRotationSensorChanged(float azimuth, float pitch, float roll);
+        void onRotationSensorChanged(float azimuth, float pitch, float roll, float wifiRssi);
     }
 }

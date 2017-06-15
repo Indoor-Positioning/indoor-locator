@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import com.mooo.sestus.indoor_locator.R;
 
+import java.text.BreakIterator;
+
 
 public class MagneticScanFragment extends Fragment implements MagneticScanContract.View {
     // TODO: Rename parameter arguments, choose names that match
@@ -20,7 +22,7 @@ public class MagneticScanFragment extends Fragment implements MagneticScanContra
 
     // TODO: Rename and change types of parameters
     private String mParam1;
-    private String mParam2;
+    private int mParam2;
 
     private MagneticScanContract.Presenter presenter;
     private TextView magneticX;
@@ -31,6 +33,7 @@ public class MagneticScanFragment extends Fragment implements MagneticScanContra
     private TextView rotationZ;
     private FloatingActionButton startRecFab;
     private FloatingActionButton stopRecFab;
+    private TextView rssi;
 
     public MagneticScanFragment() {
         // Required empty public constructor
@@ -51,7 +54,7 @@ public class MagneticScanFragment extends Fragment implements MagneticScanContra
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(FP_ID);
-            mParam2 = getArguments().getString(POINT_ID);
+            mParam2 = getArguments().getInt(POINT_ID);
         }
     }
 
@@ -65,6 +68,7 @@ public class MagneticScanFragment extends Fragment implements MagneticScanContra
         rotationX = (TextView) v.findViewById(R.id.lbl_rotation_x_val);
         rotationY = (TextView) v.findViewById(R.id.lbl_rotation_y_val);
         rotationZ = (TextView) v.findViewById(R.id.lbl_rotation_z_val);
+        rssi = (TextView) v.findViewById(R.id.lbl_rssi_val);
         startRecFab = (FloatingActionButton) getActivity().findViewById(R.id.fab_start_rec);
         stopRecFab = (FloatingActionButton) getActivity().findViewById(R.id.fab_stop_rec);
         startRecFab.setOnClickListener(new View.OnClickListener() {
@@ -105,6 +109,11 @@ public class MagneticScanFragment extends Fragment implements MagneticScanContra
     @Override
     public void updateRoll(float roll) {
         rotationZ.setText(String.format("%.2f", roll));
+    }
+
+    @Override
+    public void updateRssi(float roll) {
+        rssi.setText(String.format("%.2f", roll));
     }
 
     @Override

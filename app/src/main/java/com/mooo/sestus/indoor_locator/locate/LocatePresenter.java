@@ -11,7 +11,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-public class LocatePresenter implements LocateContract.Presenter, SensorRepository.Callback {
+public class LocatePresenter implements LocateContract.Presenter {
     private final SensorRepository sensorRepository;
     private final LocateContract.View view;
     private final FloorPlanRepository floorPlanRepository;
@@ -19,7 +19,7 @@ public class LocatePresenter implements LocateContract.Presenter, SensorReposito
     private final String floorPlanId;
     private ScheduledExecutorService scheduler;
     private ScheduledFuture scheduledRecordingTask;
-    private float[] averageMeasurement = new float[6];
+    private float[] averageMeasurement = new float[7];
     private int samplesCollected;
 
 
@@ -40,7 +40,7 @@ public class LocatePresenter implements LocateContract.Presenter, SensorReposito
                     if (closest == -1) {
                         //no fingerprints for this floor plan
                     } else
-                        view.showLocatedPointId(closest, floorPlanRepository.getFloorPlanPoints(floorPlanId).get(closest));
+                        view.showLocatedPointId(floorPlanRepository.getFloorPlanPoints(floorPlanId).get(closest));
                     samplesCollected = 0;
                     Arrays.fill(averageMeasurement, 0f);
                 }
@@ -60,7 +60,7 @@ public class LocatePresenter implements LocateContract.Presenter, SensorReposito
         view.showFloorPlanImage(floorPlanRepository.getFloorPlanById(floorPlanId).getImage());
         if (scheduler == null || scheduler.isShutdown())
             scheduler = Executors.newScheduledThreadPool(1);
-        sensorRepository.register(this);
+        sensorRepository.register(null);
         scheduledRecordingTask = scheduler.scheduleWithFixedDelay(locateRunnable, 400, 200, TimeUnit.MILLISECONDS);
     }
 
@@ -77,30 +77,6 @@ public class LocatePresenter implements LocateContract.Presenter, SensorReposito
     @Override
     public void stopRecording() {
         scheduledRecordingTask.cancel(true);
-    }
-
-    @Override
-    public void onMagneticAccuracyChanged(int accuracy) {
-        view.updateMagneticAccuracy(accuracy);
-    }
-
-    @Override
-    public void onRotationAccuracyChanged(int accuracy) {
-        view.updateRotationVectorAccuracy(accuracy);
-    }
-
-    @Override
-    public void onMagneticSensorChanged(float x, float y, float z) {
-        view.updateMagneticFieldX(x);
-        view.updateMagneticFieldY(y);
-        view.updateMagneticFieldZ(z);
-    }
-
-    @Override
-    public void onRotationSensorChanged(float azimuth, float pitch, float roll) {
-        view.updateAzimuth(azimuth);
-        view.updatePitch(pitch);
-        view.updateRoll(roll);
     }
 
 }

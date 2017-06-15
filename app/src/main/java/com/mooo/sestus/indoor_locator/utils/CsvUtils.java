@@ -70,7 +70,7 @@ public class CsvUtils {
                 }
                 CSVWriter writer = new CSVWriter(fileWriter);
                 for (Float[] a : values)
-                    writer.writeNext(String.format("%d,%f,%f,%f,%f,%f,%f",pointId,  a[0], a[1], a[2], a[3], a[4], a[5]).split(","));
+                    writer.writeNext(String.format("%d,%f,%f,%f,%f,%f,%f",pointId,  a[0], a[1], a[2], a[3], a[4], a[5], a[6]).split(","));
                 try {
                     writer.close();
                 } catch (IOException e) {
@@ -97,7 +97,7 @@ public class CsvUtils {
                     pointFingerPrints = new ArrayList<>();
                     fingerprints.put(pointId, pointFingerPrints);
                 }
-                Float[] measurements = new Float[6];
+                Float[] measurements = new Float[7];
                 for (int i = 1; i < nextLine.length; i++)
                     measurements[i-1] = (Float.valueOf(nextLine[i]));
                 pointFingerPrints.add(measurements);

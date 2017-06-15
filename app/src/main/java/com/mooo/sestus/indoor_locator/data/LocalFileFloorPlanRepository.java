@@ -166,7 +166,7 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
                 closestPoint = entry.getKey();
             }
         }
-        if (minSumOfFiveDistance >= 105)
+        if (minSumOfFiveDistance >= 200)
             return -1;
         return closestPoint;
     }
@@ -176,7 +176,9 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
         for (int i = 0; i < 3; i++) {
             distance += Math.abs(fingerprint[i] - measurement[i]);
         }
-        distance += 0.6 * Math.abs(fingerprint[3] - measurement[3]);
+        distance += Math.abs(fingerprint[3] - measurement[3]);
+        if (!fingerprint[6].equals(0f) && measurement[6] != 0)
+            distance += Math.abs(fingerprint[6] - measurement[6]);
         return (int) distance;
     }
 

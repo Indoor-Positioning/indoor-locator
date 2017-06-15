@@ -12,6 +12,8 @@ public interface MagneticScanContract {
 
         void updateRoll(float roll);
 
+        void updateRssi(float rssi);
+
         void updateMagneticFieldX(float value);
 
         void updateMagneticFieldY(float value);

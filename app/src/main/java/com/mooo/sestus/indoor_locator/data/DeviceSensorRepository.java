@@ -6,6 +6,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.view.Surface;
 import android.view.WindowManager;
@@ -15,7 +17,7 @@ public class DeviceSensorRepository implements SensorRepository, SensorEventList
     private static Sensor magneticSensorUncalibrated;
     private final float[] mAccelerometerReading = new float[3];
     private final float[] mMagnetometerReading = new float[3];
-    private final float[] lastMeasurement = new float[6];
+    private final float[] lastMeasurement = new float[7];
     private final float[] uncalibratedMagneticField = new float[3];
     private final float[] mRotationMatrix = new float[9];
     private final float[] mOrientationAngles = new float[3];
@@ -23,12 +25,14 @@ public class DeviceSensorRepository implements SensorRepository, SensorEventList
     private final WindowManager windowManager;
     private final Sensor magneticSensor;
     private final Sensor accelerometer;
+    private final WifiManager wifiManager;
     private Callback callbacks;
     private final Object lock = new Object();
 
     public DeviceSensorRepository(Activity activity) {
         windowManager = activity.getWindowManager();
         sensorManager = (SensorManager) activity.getSystemService(Context.SENSOR_SERVICE);
+        wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         magneticSensorUncalibrated = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED);
         magneticSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -50,8 +54,12 @@ public class DeviceSensorRepository implements SensorRepository, SensorEventList
     @Override
     public float[] getMeasurement() {
         synchronized (lock) {
+            float wifiRssi = 0f;
+            if (wifiManager.isWifiEnabled())
+                wifiRssi = wifiManager.getConnectionInfo().getRssi();
             System.arraycopy(uncalibratedMagneticField, 0, lastMeasurement, 0, 3);
             System.arraycopy(mOrientationAngles, 0, lastMeasurement, 3, 3);
+            lastMeasurement[6] = wifiRssi;
         }
         return lastMeasurement;
     }
@@ -82,7 +90,11 @@ public class DeviceSensorRepository implements SensorRepository, SensorEventList
                     mOrientationAngles[i] = (float) (Math.toDegrees(mOrientationAngles[i]));
                 }
             }
-            callbacks.onRotationSensorChanged(mOrientationAngles[0], mOrientationAngles[1], mOrientationAngles[2]);
+            float wifiRssi = 0f;
+            if (wifiManager.isWifiEnabled())
+                wifiRssi = wifiManager.getConnectionInfo().getRssi();
+            if (callbacks != null)
+                callbacks.onRotationSensorChanged(mOrientationAngles[0], mOrientationAngles[1], mOrientationAngles[2], wifiRssi);
         }
         else if (sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED) {
             synchronized (lock) {
@@ -90,7 +102,8 @@ public class DeviceSensorRepository implements SensorRepository, SensorEventList
                 uncalibratedMagneticField[1] = event.values[1];
                 uncalibratedMagneticField[2] = event.values[2];
             }
-            callbacks.onMagneticSensorChanged(event.values[0], event.values[1], event.values[2]);
+            if (callbacks != null)
+                callbacks.onMagneticSensorChanged(event.values[0], event.values[1], event.values[2]);
         }
 
 
@@ -127,9 +140,7 @@ public class DeviceSensorRepository implements SensorRepository, SensorEventList
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        if (sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
-            callbacks.onRotationAccuracyChanged(accuracy);
-        }else if (sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED) {
+        if (sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED && callbacks != null) {
             callbacks.onMagneticAccuracyChanged(accuracy);
         }
     }
