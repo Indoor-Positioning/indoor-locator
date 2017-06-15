@@ -21,6 +21,8 @@ public class PinView extends SubsamplingScaleImageView {
     private Bitmap selectedPin;
     private Bitmap newPin;
     private Bitmap basicPin;
+    private Bitmap locatedPoint;
+    private PointF prevLocatedPoint;
     private List<PointF> pins;
     private Map<PointF, Bitmap> pinIcons;
 
@@ -35,6 +37,7 @@ public class PinView extends SubsamplingScaleImageView {
         basicPin = BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_pin_black);
         newPin = BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_pin_red);
         selectedPin = BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_pin_blue);
+        locatedPoint = BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_location);
         initialise();
     }
 
@@ -61,6 +64,19 @@ public class PinView extends SubsamplingScaleImageView {
         pinIcons.put(pin, bitmap);
     }
 
+
+    public void addLocatedPin(PointF point) {
+        if (prevLocatedPoint != null) {
+            pinIcons.remove(prevLocatedPoint);
+            pins.remove(prevLocatedPoint);
+        }
+        pins.add(point);
+        pinIcons.put(point, locatedPoint);
+        prevLocatedPoint = point;
+        initialise();
+        invalidate();
+    }
+
     public void setPins(Collection<PointF> pins) {
         for (PointF pin: pins)
             addPin(pin, basicPin);
@@ -79,6 +95,7 @@ public class PinView extends SubsamplingScaleImageView {
         basicPin = Bitmap.createScaledBitmap(basicPin, (int)w, (int)h, true);
         newPin = Bitmap.createScaledBitmap(newPin, (int)w, (int)h, true);
         selectedPin = Bitmap.createScaledBitmap(selectedPin, (int)w, (int)h, true);
+        locatedPoint = Bitmap.createScaledBitmap(locatedPoint, (int)w, (int)h, true);
     }
 
     @Override
@@ -107,4 +124,5 @@ public class PinView extends SubsamplingScaleImageView {
     public void removePin(PointF pin) {
         pins.remove(pin);
     }
+
 }

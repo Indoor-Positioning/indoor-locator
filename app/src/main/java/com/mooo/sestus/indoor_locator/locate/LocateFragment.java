@@ -1,5 +1,7 @@
 package com.mooo.sestus.indoor_locator.locate;
 
+import android.graphics.Bitmap;
+import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -8,7 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.mooo.sestus.indoor_locator.R;
+import com.mooo.sestus.indoor_locator.viewfloorplan.PinView;
 
 
 public class LocateFragment extends Fragment implements LocateContract.View {
@@ -29,6 +33,7 @@ public class LocateFragment extends Fragment implements LocateContract.View {
     private TextView rotationY;
     private TextView rotationZ;
     private TextView locatedPoint;
+    private PinView floorPlanImage;
 
 
     public LocateFragment() {
@@ -57,6 +62,7 @@ public class LocateFragment extends Fragment implements LocateContract.View {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_locate, container, false);
+        floorPlanImage = (PinView) v.findViewById(R.id.imageView);
         magneticX = (TextView) v.findViewById(R.id.lbl_magnetic_x_val);
         magneticY = (TextView) v.findViewById(R.id.lbl_magnetic_y_val);
         magneticZ = (TextView) v.findViewById(R.id.lbl_magnetic_z_val);
@@ -114,12 +120,18 @@ public class LocateFragment extends Fragment implements LocateContract.View {
     }
 
     @Override
-    public void showLocatedPointId(final int pointId) {
+    public void showLocatedPointId(final int pointId, final PointF point) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 locatedPoint.setText(String.format("Point %d", pointId));
+                floorPlanImage.addLocatedPin(point);
             }
         });
+    }
+
+    @Override
+    public void showFloorPlanImage(Bitmap image) {
+        floorPlanImage.setImage(ImageSource.cachedBitmap(image));
     }
 }

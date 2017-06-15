@@ -16,6 +16,7 @@ public class LocatePresenter implements LocateContract.Presenter, SensorReposito
     private final LocateContract.View view;
     private final FloorPlanRepository floorPlanRepository;
     private final Runnable locateRunnable;
+    private final String floorPlanId;
     private ScheduledExecutorService scheduler;
     private ScheduledFuture scheduledRecordingTask;
     private float[] averageMeasurement = new float[6];
@@ -27,6 +28,7 @@ public class LocatePresenter implements LocateContract.Presenter, SensorReposito
         this.sensorRepository = sensorRepository;
         this.floorPlanRepository = floorPlanRepository;
         this.view = view;
+        this.floorPlanId = floorPlanId;
         this.locateRunnable = new Runnable() {
             @Override
             public void run() {
@@ -38,7 +40,7 @@ public class LocatePresenter implements LocateContract.Presenter, SensorReposito
                     if (closest == -1) {
                         //no fingerprints for this floor plan
                     } else
-                        view.showLocatedPointId(closest);
+                        view.showLocatedPointId(closest, floorPlanRepository.getFloorPlanPoints(floorPlanId).get(closest));
                     samplesCollected = 0;
                     Arrays.fill(averageMeasurement, 0f);
                 }
@@ -55,6 +57,7 @@ public class LocatePresenter implements LocateContract.Presenter, SensorReposito
 
     @Override
     public void start() {
+        view.showFloorPlanImage(floorPlanRepository.getFloorPlanById(floorPlanId).getImage());
         if (scheduler == null || scheduler.isShutdown())
             scheduler = Executors.newScheduledThreadPool(1);
         sensorRepository.register(this);

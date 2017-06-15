@@ -166,7 +166,7 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
                 closestPoint = entry.getKey();
             }
         }
-        if (minSumOfFiveDistance >= 100)
+        if (minSumOfFiveDistance >= 105)
             return -1;
         return closestPoint;
     }

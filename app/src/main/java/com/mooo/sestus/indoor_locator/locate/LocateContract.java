@@ -1,5 +1,8 @@
 package com.mooo.sestus.indoor_locator.locate;
 
+import android.graphics.Bitmap;
+import android.graphics.PointF;
+
 import com.mooo.sestus.indoor_locator.BasePresenter;
 import com.mooo.sestus.indoor_locator.BaseView;
 
@@ -22,7 +25,9 @@ public interface LocateContract {
 
         void updateRotationVectorAccuracy(int accuracy);
 
-        void showLocatedPointId(int pointId);
+        void showLocatedPointId(int pointId, PointF point);
+
+        void showFloorPlanImage(Bitmap image);
     }
 
     interface Presenter extends BasePresenter {
