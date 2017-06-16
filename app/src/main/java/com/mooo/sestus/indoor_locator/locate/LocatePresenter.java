@@ -1,13 +1,17 @@
 package com.mooo.sestus.indoor_locator.locate;
 
+import android.util.Log;
+
 import com.mooo.sestus.indoor_locator.data.FloorPlanRepository;
 import com.mooo.sestus.indoor_locator.data.SensorRepository;
-
 import org.apache.commons.lang3.ArrayUtils;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -26,6 +30,10 @@ public class LocatePresenter implements LocateContract.Presenter {
     private LinkedList<Integer> lastResolvedLocations = new LinkedList<>();
     private int lastResolvedPoint = -1;
     private HashMap<Integer, Integer> locationOccurences = new HashMap<>();
+    private int lastComputedDistance;
+    private static final double ORIENTATION_DISTANCE_NORMALIZATION_FACTOR = 0.2;
+    private static final int WIFI_RSSI_DISTANCE_NORMALIZATION_FACTOR = 4;
+    private Map<Integer, List<Float[]>> fingerPrints;
 
 
     public LocatePresenter(final FloorPlanRepository floorPlanRepository, final SensorRepository sensorRepository,
@@ -34,35 +42,7 @@ public class LocatePresenter implements LocateContract.Presenter {
         this.floorPlanRepository = floorPlanRepository;
         this.view = view;
         this.floorPlanId = floorPlanId;
-        this.locateRunnable = new Runnable() {
-            @Override
-            public void run() {
-                float[] measurements = LocatePresenter.this.sensorRepository.getMeasurement();
-                averageMeasurement = ArrayUtils.addAll(measurements, averageMeasurement);
-                if (++samplesCollected == 5) {
-                    divideArrayBy(5, averageMeasurement);
-                    int closestPoint = floorPlanRepository.getClosestPoint(measurements, floorPlanId);
-                    float distance = floorPlanRepository.getLastComputedDistance();
-                    if (distance >= 24) {
-                        view.showDistance(String.format("Point: %d\n Dist: %.2f", closestPoint, distance));
-                    } else {
-                        addResolvedLocation(closestPoint);
-                        int resolvedPoint = getResolvedPoint();
-                        if (resolvedPoint != lastResolvedPoint) {
-                            lastResolvedPoint = resolvedPoint;
-                            view.showLocatedPointId(floorPlanRepository.getFloorPlanPoints(floorPlanId).get(lastResolvedPoint));
-                            view.showDistance(String.format("Point: %d\n Dist: %.2f", closestPoint, distance));
-                        }
-                        else {
-                            view.showDistance(String.format("Point: %d\n Dist: %.2f", closestPoint, distance));
-                        }
-                    }
-                    samplesCollected = 0;
-                    Arrays.fill(averageMeasurement, 0f);
-                }
-
-            }
-        };
+        this.locateRunnable = createLocateTask();
         view.setPresenter(this);
     }
 
@@ -85,6 +65,7 @@ public class LocatePresenter implements LocateContract.Presenter {
             scheduler = Executors.newScheduledThreadPool(1);
         sensorRepository.register(null);
         scheduledRecordingTask = scheduler.scheduleWithFixedDelay(locateRunnable, 400, 200, TimeUnit.MILLISECONDS);
+        this.fingerPrints = floorPlanRepository.getFingerPrints(floorPlanId);
     }
 
     @Override
@@ -120,4 +101,94 @@ public class LocatePresenter implements LocateContract.Presenter {
         }
         return point;
     }
+
+    private int getClosestPoint(float[] measurement) {
+        if (fingerPrints == null)
+            return -1;
+        Set<Map.Entry<Integer, List<Float[]>>> entrySet = fingerPrints.entrySet();
+        int distance = Integer.MAX_VALUE;
+        int pointId = 0;
+        Log.v("LOCATE", String.format("Locating fingerprint %s on %d points", Arrays.toString(measurement), entrySet.size()));
+        for (Map.Entry<Integer, List<Float[]>> entry : entrySet) {
+            Log.v("LOCATE", String.format("Trying Point %d which has %d fingerprints", entry.getKey(), entry.getValue().size()));
+            for (Float[] fingerprint: entry.getValue()) {
+                int newDistance = computeDistance(fingerprint, measurement);
+                if (newDistance < distance) {
+                    distance = newDistance;
+                    pointId = entry.getKey();
+                }
+            }
+        }
+        lastComputedDistance = distance;
+        return pointId;
+    }
+
+
+    private int computeDistance(Float[] fingerprint, float[] measurement) {
+        float distance = 0;
+
+        distance += magneticFieldDistance(fingerprint, measurement);
+
+        distance += orientationDistance(fingerprint, measurement);
+
+        distance += wifiRssiDistance(fingerprint, measurement);
+
+        return (int) distance;
+    }
+
+    private float wifiRssiDistance(Float[] fingerprint, float[] measurement) {
+        float distance = 0 ;
+        if (!fingerprint[6].equals(0f) && measurement[6] != 0)
+            distance += WIFI_RSSI_DISTANCE_NORMALIZATION_FACTOR * Math.abs(fingerprint[6] - measurement[6]);
+        return distance;
+    }
+
+    private float orientationDistance(Float[] fingerprint, float[] measurement) {
+        float distance = 0;
+        for (int i = 3; i < 6; i++) {
+            distance += ORIENTATION_DISTANCE_NORMALIZATION_FACTOR * Math.abs(fingerprint[i] - measurement[i]);
+        }
+        return distance;
+    }
+
+    private float magneticFieldDistance(Float[] fingerprint, float[] measurement) {
+        float distance = 0;
+        for (int i = 0; i < 3; i++) {
+            distance += Math.abs(fingerprint[i] - measurement[i]);
+        }
+        return distance;
+    }
+
+    private Runnable createLocateTask() {
+        return new Runnable() {
+            @Override
+            public void run() {
+                float[] measurements = LocatePresenter.this.sensorRepository.getMeasurement();
+                averageMeasurement = ArrayUtils.addAll(measurements, averageMeasurement);
+                if (++samplesCollected == 5) {
+                    divideArrayBy(5, averageMeasurement);
+                    int closestPoint = getClosestPoint(measurements);
+                    if (lastComputedDistance >= 24) {
+                        view.showDistance(String.format(Locale.getDefault(), "Point: %d\n Dist: %d", closestPoint, lastComputedDistance));
+                    } else {
+                        addResolvedLocation(closestPoint);
+                        int resolvedPoint = getResolvedPoint();
+                        if (resolvedPoint != lastResolvedPoint) {
+                            lastResolvedPoint = resolvedPoint;
+                            view.showLocatedPointId(floorPlanRepository.getFloorPlanPoints(floorPlanId).get(lastResolvedPoint));
+                            view.showDistance(String.format(Locale.getDefault(), "Point: %d\n Dist: %d", closestPoint, lastComputedDistance));
+                        }
+                        else {
+                            view.showDistance(String.format(Locale.getDefault(), "Point: %d\n Dist: %d", closestPoint, lastComputedDistance));
+                        }
+                    }
+                    samplesCollected = 0;
+                    Arrays.fill(averageMeasurement, 0f);
+                }
+
+            }
+        };
+    }
+
+
 }

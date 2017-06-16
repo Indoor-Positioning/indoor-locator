@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.PointF;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.mooo.sestus.indoor_locator.utils.CsvUtils;
 
@@ -19,25 +18,22 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.TreeMap;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class LocalFileFloorPlanRepository implements FloorPlanRepository {
+
     private static LocalFileFloorPlanRepository INSTANCE;
     private final File appDir;
     private Map<String, FloorPlan> floorPlanMap;
     private Map<String, Map<Integer, List<Float[]>>> fingerPrints = new HashMap<>();
     private Map<String, List<PointF>> floorPlanPoints;
     private Map<String, Properties> propertiesMap;
-    private int lastComputedDistance;
 
     private LocalFileFloorPlanRepository(@NonNull Context context) {
         appDir = context.getFilesDir();
@@ -55,7 +51,8 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
         if (points == null)
             floorPlanPoints.put(floorPlanId, points = new ArrayList<>());
         points.add(pointF);
-        CsvUtils.writeToCsv(propertiesMap.get(floorPlanId).getProperty("pointsPath"), pointF);
+        //TODO: Bulk - write the points to CSV, opening a new FileWriter on every added point is bad
+        CsvUtils.savePointToCsv(propertiesMap.get(floorPlanId).getProperty("pointsPath"), pointF);
     }
 
     @Override
@@ -64,7 +61,8 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
     }
 
     @Override
-    public int getPinId(String floorPlanId, PointF point) {
+    //TODO: if points list get too long, the indexOf method will be slow (O(n) on each lookup)
+    public int getPointId(String floorPlanId, PointF point) {
         return floorPlanPoints.get(floorPlanId).indexOf(point);
     }
 
@@ -101,7 +99,7 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
     }
 
     @Override
-    public boolean containsFloorPlan(String name, Bitmap bitmap) {
+    public boolean containsFloorPlan(String name) {
         return floorPlanMap.containsKey(name);
     }
 
@@ -116,8 +114,6 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
         if (floorPlanEntry == null) {
             floorPlanEntry = new HashMap<>();
             fingerPrints.put(floorPlanId, floorPlanEntry);
-            List<Float[]> values = new ArrayList<>();
-            floorPlanEntry.put(pointId, values);
         }
         List<Float[]> values = floorPlanEntry.get(pointId);
         if (values == null) {
@@ -134,63 +130,10 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
     }
 
     @Override
-    public int getClosestPoint(float[] measurement, String floorPlanId) {
-        if (fingerPrints.get(floorPlanId) == null)
-            return -1;
-        Set<Map.Entry<Integer, List<Float[]>>> entrySet = fingerPrints.get(floorPlanId).entrySet();
-        int distance = Integer.MAX_VALUE;
-        int pointId = 0;
-        Log.v("LOCATE", String.format("Locating fingerprint %s on %d points", Arrays.toString(measurement), entrySet.size()));
-        for (Map.Entry<Integer, List<Float[]>> entry : entrySet) {
-            Log.v("LOCATE", String.format("Trying Point %d which has %d fingerprints", entry.getKey(), entry.getValue().size()));
-            for (Float[] fingerprint: entry.getValue()) {
-                int newDistance = computeDistance(fingerprint, measurement);
-                if (newDistance < distance) {
-                    distance = newDistance;
-                    pointId = entry.getKey();
-                }
-            }
-        }
-        lastComputedDistance = distance;
-        return pointId;
+    public Map<Integer, List<Float[]>> getFingerPrints(String floorPlanId) {
+        return fingerPrints.get(floorPlanId);
     }
 
-    private int computeClosestPoint(Map<Integer, List<Integer>> distances) {
-        int minSumOfFiveDistance = Integer.MAX_VALUE;
-        int closestPoint = -1;
-        for (Map.Entry<Integer, List<Integer>> entry : distances.entrySet()) {
-            List<Integer> pointDistances = entry.getValue();
-            Collections.sort(pointDistances);
-            int pointMinOfFiveSum = 0;
-            for (int i = 0; i < 5; i++)
-                pointMinOfFiveSum += pointDistances.get(i);
-            if (pointMinOfFiveSum < minSumOfFiveDistance) {
-                minSumOfFiveDistance = pointMinOfFiveSum;
-                closestPoint = entry.getKey();
-            }
-        }
-        if (minSumOfFiveDistance >= 200)
-            return -1;
-        return closestPoint;
-    }
-
-    private int computeDistance(Float[] fingerprint, float[] measurement) {
-        float distance = 0;
-        //magnetic field
-        for (int i = 0; i < 3; i++) {
-            distance += Math.abs(fingerprint[i] - measurement[i]);
-        }
-        //"orientation" - not very accurate
-        for (int i = 3; i < 6; i++) {
-            distance += 0.2 * Math.abs(fingerprint[i] - measurement[i]);
-        }
-
-        //wifi rssi
-        distance += Math.abs(fingerprint[3] - measurement[3]);
-        if (!fingerprint[6].equals(0f) && measurement[6] != 0)
-            distance += 4 * Math.abs(fingerprint[6] - measurement[6]);
-        return (int) distance;
-    }
 
     @Override
     public void getFloorPlans(@NonNull final FloorPlanRepository.LoadFloorPlansCallback callback) {
@@ -206,10 +149,6 @@ public class LocalFileFloorPlanRepository implements FloorPlanRepository {
             callback.onFloorPlansLoaded(floorPlanMap.values());
     }
 
-    @Override
-    public int getLastComputedDistance() {
-        return lastComputedDistance;
-    }
 
     private void reloadFloorPlans() {
         floorPlanMap = new TreeMap<>();

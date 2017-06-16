@@ -5,6 +5,9 @@ import android.support.annotation.NonNull;
 
 import java.util.Objects;
 
+/**
+ * TODO: Standardize, error-check the FloorPlan id which is currently a simple String.
+ */
 public class FloorPlan implements Comparable<FloorPlan> {
     private final String id;
     private final Bitmap image;

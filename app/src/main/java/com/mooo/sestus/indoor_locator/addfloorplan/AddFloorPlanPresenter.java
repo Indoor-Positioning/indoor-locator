@@ -51,12 +51,14 @@ public class AddFloorPlanPresenter implements AddFloorPlanContract.Presenter {
         repository.addFloorPlan(name, photo, new FloorPlanRepository.SaveFloorPlanCallback() {
             @Override
             public void onFloorPlanSaved(FloorPlan floorPlan) {
-                viewFloorPlan(floorPlan);
+                if (!isStopped)
+                    viewFloorPlan(floorPlan);
             }
 
             @Override
             public void onError() {
-                view.showErrorOnSavingFloorPlan();
+                if (!isStopped)
+                    view.showErrorOnSavingFloorPlan();
             }
         });
 

@@ -28,8 +28,6 @@ public interface ViewFloorPlanContract {
     interface Presenter extends BasePresenter {
         void onPinConfirmed();
 
-        void recordFingerprints(PointF pin);
-
         void onUserClickedFloorPlan(PointF pointF);
 
         void scanSelectedPin();

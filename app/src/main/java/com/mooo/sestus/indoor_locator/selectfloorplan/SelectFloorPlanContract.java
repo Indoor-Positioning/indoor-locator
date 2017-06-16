@@ -14,7 +14,6 @@ import java.util.SortedSet;
 interface SelectFloorPlanContract {
 
     interface View extends BaseView<Presenter> {
-        void setLoadingIndicator();
 
         void showErrorOnLoadingFloorPlans();
 

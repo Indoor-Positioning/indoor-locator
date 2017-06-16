@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 public class CsvUtils {
-    public static void writeToCsv(final String file, final PointF point) {
+    public static void savePointToCsv(final String file, final PointF point) {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {

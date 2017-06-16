@@ -12,10 +12,9 @@ public interface SensorRepository {
     interface Callback {
         void onMagneticAccuracyChanged(int accuracy);
 
-        void onRotationAccuracyChanged(int accuracy);
-
         void onMagneticSensorChanged(float x, float y, float z);
 
+        //TODO: This is hacky, remove wifiRssi from onRotationSensorChanged Callback - define a new one
         void onRotationSensorChanged(float azimuth, float pitch, float roll, float wifiRssi);
     }
 }

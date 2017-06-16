@@ -7,29 +7,39 @@ import android.support.annotation.NonNull;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
 
-/**
- * Created by mike on 5/29/17.
- */
 
+/**
+ * This is supposed to be an abstracted repository to obtain floorplan, point, fingerprint info.
+ * The current implementation, LocalileFloorPlanRepository stores the above info in local csv files.
+ * Hypothetically, we could swap this repository with a RemoteFloorPlanRepository on a remote server.
+ * TODO: Define a more clear interface, remove unnecessary methods, be consistent on callbacks.
+ */
 public interface FloorPlanRepository {
+
+    void addFloorPlan(String name, Bitmap bitmap, SaveFloorPlanCallback callback);
+
+    void getFloorPlans(@NonNull LoadFloorPlansCallback callback);
+
+    FloorPlan getFloorPlanById(String floorPlanId);
+
+    boolean containsFloorPlan(String name);
+
 
     void addPointToFloorPlan(String floorPlanId, PointF pointF);
 
     List<PointF> getFloorPlanPoints(String floorPlanId);
 
-    int getPinId(String floorplanId, PointF point);
+    int getPointId(String floorplanId, PointF point);
 
-    void addFloorPlan(String name, Bitmap bitmap, SaveFloorPlanCallback callback);
-
-    boolean containsFloorPlan(String name, Bitmap bitmap);
-
-    FloorPlan getFloorPlanById(String floorPlanId);
 
     void addFingerPrint(String floorPlanId, int pointId, float[] measurements);
 
-    int getLastComputedDistance();
+    void saveFingerPrints(String floorPlanId, int pointId);
+
+    Map<Integer, List<Float[]>> getFingerPrints(String floorPlanId);
 
     interface SaveFloorPlanCallback {
         void onFloorPlanSaved(FloorPlan floorPlan);
@@ -42,11 +52,4 @@ public interface FloorPlanRepository {
 
         void onDataNotAvailable();
     }
-
-
-    void saveFingerPrints(String floorPlanId, int pointId);
-
-    int getClosestPoint(float[] fingerprint, String floorPlanId);
-
-    void getFloorPlans(@NonNull LoadFloorPlansCallback callback);
 }

@@ -26,7 +26,7 @@
             android:id="@+id/note"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:text="Touch Image to start recording on Location"
+            android:text="@string/floorplan_add_location_description"
             android:gravity="center_horizontal"
             android:textSize="14sp"
             android:textColor="@color/white"

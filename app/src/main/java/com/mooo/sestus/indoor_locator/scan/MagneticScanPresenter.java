@@ -70,11 +70,6 @@ public class MagneticScanPresenter implements MagneticScanContract.Presenter, Se
     }
 
     @Override
-    public void onRotationAccuracyChanged(int accuracy) {
-        view.updateRotationVectorAccuracy(accuracy);
-    }
-
-    @Override
     public void onMagneticSensorChanged(float x, float y, float z) {
         view.updateMagneticFieldX(x);
         view.updateMagneticFieldY(y);

@@ -25,4 +25,5 @@
     <string name="locate">locate</string>
     <string name="rssi">rssi</string>
     <string name="distance">distance</string>
+    <string name="floorplan_add_location_description">Touch the floorplan image to add a location</string>
 </resources>

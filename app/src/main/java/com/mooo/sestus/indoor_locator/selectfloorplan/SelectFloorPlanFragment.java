@@ -65,11 +65,6 @@ public class SelectFloorPlanFragment extends Fragment implements SelectFloorPlan
     }
 
     @Override
-    public void setLoadingIndicator() {
-
-    }
-
-    @Override
     public void showErrorOnLoadingFloorPlans() {
         Snackbar.make(getView(), "Failed to load Floor Plans", Snackbar.LENGTH_LONG).show();
     }

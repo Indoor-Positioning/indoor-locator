@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.mooo.sestus.indoor_locator.R;
 
 import java.text.BreakIterator;
+import java.util.Locale;
 
 
 public class MagneticScanFragment extends Fragment implements MagneticScanContract.View {
@@ -98,37 +99,37 @@ public class MagneticScanFragment extends Fragment implements MagneticScanContra
 
     @Override
     public void updateAzimuth(float azimuth) {
-        rotationX.setText(String.format("%.2f", azimuth));
+        rotationX.setText(String.format(Locale.getDefault(), "%.2f", azimuth));
     }
 
     @Override
     public void updatePitch(float pitch) {
-        rotationY.setText(String.format("%.2f", pitch));
+        rotationY.setText(String.format(Locale.getDefault(), "%.2f", pitch));
     }
 
     @Override
     public void updateRoll(float roll) {
-        rotationZ.setText(String.format("%.2f", roll));
+        rotationZ.setText(String.format(Locale.getDefault(), "%.2f", roll));
     }
 
     @Override
     public void updateRssi(float roll) {
-        rssi.setText(String.format("%.2f", roll));
+        rssi.setText(String.format(Locale.getDefault(), "%.2f", roll));
     }
 
     @Override
     public void updateMagneticFieldX(float fieldX) {
-        magneticX.setText(String.format("%.2f", fieldX));
+        magneticX.setText(String.format(Locale.getDefault(), "%.2f", fieldX));
     }
 
     @Override
     public void updateMagneticFieldY(float fieldY) {
-        magneticY.setText(String.format("%.2f", fieldY));
+        magneticY.setText(String.format(Locale.getDefault(), "%.2f", fieldY));
     }
 
     @Override
     public void updateMagneticFieldZ(float fieldZ) {
-        magneticZ.setText(String.format("%.2f", fieldZ));
+        magneticZ.setText(String.format(Locale.getDefault(), "%.2f", fieldZ));
     }
 
     @Override
