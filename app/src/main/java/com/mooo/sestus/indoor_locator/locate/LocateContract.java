@@ -6,14 +6,20 @@ import android.graphics.PointF;
 import com.mooo.sestus.indoor_locator.BasePresenter;
 import com.mooo.sestus.indoor_locator.BaseView;
 
+import java.util.Collection;
+
 public interface LocateContract {
 
     interface View extends BaseView<Presenter> {
         void showLocatedPointId(PointF point);
 
+        void showNearestPoi(PointF pointF);
+
+        void showIsOnPoi(PointF pointF);
+
         void showDistance(String pointDistance);
 
-        void showFloorPlanImage(Bitmap image);
+        void showFloorPlanImage(String resourceName, Collection<PointF> pointsOfInterest);
     }
 
     interface Presenter extends BasePresenter {

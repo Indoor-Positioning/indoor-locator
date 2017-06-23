@@ -22,7 +22,7 @@ public class LocateActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        String floorPlanId = getIntent().getStringExtra(FLOOR_PLAN_ID);
+        int floorPlanId = getIntent().getIntExtra(FLOOR_PLAN_ID, -1);
         FragmentManager fragManager = this.getSupportFragmentManager();
         LocateFragment fragment = (LocateFragment) fragManager.findFragmentByTag(LOCATE_FRAGMENT);
 

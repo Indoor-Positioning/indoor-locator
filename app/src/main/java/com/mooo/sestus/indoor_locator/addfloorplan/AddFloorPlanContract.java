@@ -18,7 +18,7 @@ public interface AddFloorPlanContract {
 
         void showEmptyPhotoError();
 
-        void startViewFloorPlanActivity(String floorPlanId);
+        void startViewFloorPlanActivity(int floorPlanId);
 
         void showErrorOnSavingFloorPlan();
 

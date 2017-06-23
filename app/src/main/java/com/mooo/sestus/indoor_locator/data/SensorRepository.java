@@ -6,7 +6,7 @@ public interface SensorRepository {
 
     void deRegister();
 
-    float[] getMeasurement();
+    FingerPrint getCurrentFingerPrint();
 
 
     interface Callback {

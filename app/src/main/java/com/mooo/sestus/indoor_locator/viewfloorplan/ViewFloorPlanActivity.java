@@ -22,7 +22,7 @@ public class ViewFloorPlanActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        String floorPlanId = getIntent().getStringExtra(FLOOR_PLAN_ID);
+        int floorPlanId = getIntent().getIntExtra(FLOOR_PLAN_ID, -1);
         fragManager = this.getSupportFragmentManager();
         ViewFloorPlanFragment fragment = (ViewFloorPlanFragment) fragManager.findFragmentByTag(VIEW_FLOOR_PLAN_FRAGMENT);
         if (fragment == null) {

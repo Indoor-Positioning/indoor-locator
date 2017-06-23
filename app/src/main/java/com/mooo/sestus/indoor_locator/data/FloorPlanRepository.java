@@ -19,27 +19,31 @@ import java.util.SortedSet;
  */
 public interface FloorPlanRepository {
 
-    void addFloorPlan(String name, Bitmap bitmap, SaveFloorPlanCallback callback);
+    FloorPlan addFloorPlan(String name, Bitmap bitmap, SaveFloorPlanCallback callback);
 
     void getFloorPlans(@NonNull LoadFloorPlansCallback callback);
 
-    FloorPlan getFloorPlanById(String floorPlanId);
+    FloorPlan getFloorPlanById(int floorPlanId);
 
     boolean containsFloorPlan(String name);
 
+    void addFingerPrintedLocation(int floorPlanId, PointF pointF, AddFingerPrintedLocationCallback callback);
 
-    void addPointToFloorPlan(String floorPlanId, PointF pointF);
+    void getFingerPrintedLocations(int floorPlanId, LoadFingerPrintedLocationsCallback callback);
 
-    List<PointF> getFloorPlanPoints(String floorPlanId);
+    FingerPrintedLocation getFingerPrintedLocationById(int id);
 
-    int getPointId(String floorplanId, PointF point);
+    void addPoiToFloorPlan(int floorPlanId, PointF awaitingPin, AddPoiCallback callback);
 
+    void getFloorPlanPois(int floorPlanId, LoadPointOfInterestsCallback callback);
 
-    void addFingerPrint(String floorPlanId, int pointId, float[] measurements);
+    PointOfInterest getPointOfInterestById(int id);
 
-    void saveFingerPrints(String floorPlanId, int pointId);
+    void addFingerPrint(FingerPrint fingerPrint);
 
-    Map<Integer, List<Float[]>> getFingerPrints(String floorPlanId);
+    void saveFingerPrints();
+
+    void getClosestPoint(int floorPlanId, FingerPrint fingerPrint, LocateCallback callback);
 
     interface SaveFloorPlanCallback {
         void onFloorPlanSaved(FloorPlan floorPlan);
@@ -51,5 +55,35 @@ public interface FloorPlanRepository {
         void onFloorPlansLoaded(Collection<FloorPlan> floorPlans);
 
         void onDataNotAvailable();
+    }
+
+    interface LoadFingerPrintedLocationsCallback {
+        void onLocationsLoaded(Collection<FingerPrintedLocation> locations);
+
+        void onDataNotAvailable();
+    }
+
+    interface LoadPointOfInterestsCallback {
+        void onPoisLoaded(Collection<PointOfInterest> points);
+
+        void onDataNotAvailable();
+    }
+
+    interface AddFingerPrintedLocationCallback {
+        void onLocationAdded(FingerPrintedLocation location);
+
+        void onError();
+    }
+
+    interface AddPoiCallback {
+        void onPoiAdded(PointOfInterest poi);
+
+        void onError();
+    }
+
+    interface LocateCallback {
+        void onLocateResult(ResolvedLocation location);
+
+        void onError();
     }
 }

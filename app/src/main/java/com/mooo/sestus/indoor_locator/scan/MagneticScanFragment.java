@@ -41,23 +41,11 @@ public class MagneticScanFragment extends Fragment implements MagneticScanContra
     }
 
 
-    public static MagneticScanFragment newInstance(String floorPlan, int point) {
+    public static MagneticScanFragment newInstance(int floorPlan, int point) {
         MagneticScanFragment fragment = new MagneticScanFragment();
-        Bundle args = new Bundle();
-        args.putString(FP_ID, floorPlan);
-        args.putInt(POINT_ID, point);
-        fragment.setArguments(args);
         return fragment;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(FP_ID);
-            mParam2 = getArguments().getInt(POINT_ID);
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -138,12 +126,7 @@ public class MagneticScanFragment extends Fragment implements MagneticScanContra
     }
 
     @Override
-    public void updateRotationVectorAccuracy(int accuracy) {
-        Snackbar.make(getView(), "Rotation changed: " + accuracy, Snackbar.LENGTH_LONG).show();
-    }
-
-    @Override
     public void showAddedFingerPrints(int fingerPrintsAdded) {
-        Snackbar.make(getView(), String.format("Successfully added %d fingerprints", fingerPrintsAdded), Snackbar.LENGTH_LONG).show();
+        Snackbar.make(getView(), String.format(Locale.getDefault(), "Successfully added %d fingerprints", fingerPrintsAdded), Snackbar.LENGTH_LONG).show();
     }
 }

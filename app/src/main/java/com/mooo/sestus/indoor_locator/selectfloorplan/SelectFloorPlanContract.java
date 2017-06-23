@@ -19,7 +19,7 @@ interface SelectFloorPlanContract {
 
         void updateFloorPlanList(Collection<FloorPlan> floorPlanList);
 
-        void startViewFloorPlanActivity(String floorPlanId);
+        void startViewFloorPlanActivity(int floorPlanId);
 
         void startAddFloorPlanActivity();
 

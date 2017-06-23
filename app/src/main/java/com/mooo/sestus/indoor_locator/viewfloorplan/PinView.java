@@ -25,6 +25,12 @@ public class PinView extends SubsamplingScaleImageView {
     private PointF prevLocatedPoint;
     private List<PointF> pins;
     private Map<PointF, Bitmap> pinIcons;
+    private Bitmap basicPoi;
+    private Bitmap newPoi;
+    private Bitmap nearByPoi;
+    private Bitmap selectedPoi;
+    private PointF previousNearByPoi;
+    private PointF previousActivePoi;
 
     public PinView(Context context) {
         this(context, null);
@@ -37,6 +43,10 @@ public class PinView extends SubsamplingScaleImageView {
         basicPin = BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_pin_black);
         newPin = BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_pin_red);
         selectedPin = BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_pin_blue);
+        basicPoi = BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_poi_black);
+        newPoi = BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_poi_red);
+        selectedPoi = BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_poi_blue);
+        nearByPoi = BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_poi_green);
         locatedPoint = BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_location);
         initialise();
     }
@@ -47,14 +57,70 @@ public class PinView extends SubsamplingScaleImageView {
         invalidate();
     }
 
+
+    public void addNewPoi(PointF pin) {
+        addPin(pin, newPoi);
+        initialise();
+        invalidate();
+    }
+
     public void setAddedPin(PointF pin) {
         pinIcons.put(pin, basicPin);
         initialise();
         invalidate();
     }
 
+
+    public void setAddedPoi(PointF pin) {
+        pinIcons.put(pin, basicPoi);
+        initialise();
+        invalidate();
+    }
+
     public void setSelectedPin(PointF pin) {
         pinIcons.put(pin, selectedPin);
+        initialise();
+        invalidate();
+    }
+
+    public void setSelectedPoi(PointF pin) {
+        pinIcons.put(pin, selectedPoi);
+        initialise();
+        invalidate();
+    }
+
+    public void setNearByPoi(PointF pin) {
+        if (previousNearByPoi != null) {
+            pinIcons.put(previousNearByPoi, basicPoi);
+            previousNearByPoi = null;
+        }
+        if (previousActivePoi != null) {
+            pinIcons.put(previousActivePoi, basicPoi);
+            previousActivePoi = null;
+        }
+        pinIcons.put(pin, nearByPoi);
+        previousNearByPoi = pin;
+        initialise();
+        invalidate();
+    }
+
+
+    public void setActivePoi(PointF pointF) {
+        if (previousActivePoi != null) {
+            pinIcons.put(previousActivePoi, basicPoi);
+            previousActivePoi = null;
+        }
+        if (previousNearByPoi != null) {
+            pinIcons.put(previousNearByPoi, basicPoi);
+            previousNearByPoi = null;
+        }
+        if (prevLocatedPoint != null) {
+            pinIcons.remove(prevLocatedPoint);
+            pins.remove(prevLocatedPoint);
+            prevLocatedPoint = null;
+        }
+        pinIcons.put(pointF, selectedPoi);
+        previousActivePoi = pointF;
         initialise();
         invalidate();
     }
@@ -80,6 +146,13 @@ public class PinView extends SubsamplingScaleImageView {
     public void setPins(Collection<PointF> pins) {
         for (PointF pin: pins)
             addPin(pin, basicPin);
+        initialise();
+        invalidate();
+    }
+
+    public void setPois(Collection<PointF> floorPlanPois) {
+        for (PointF pin: floorPlanPois)
+            addPin(pin, basicPoi);
         initialise();
         invalidate();
     }
@@ -124,5 +197,13 @@ public class PinView extends SubsamplingScaleImageView {
     public void removePin(PointF pin) {
         pins.remove(pin);
     }
+
+
+
+
+    public void removePoi(PointF pin) {
+        pins.remove(pin);
+    }
+
 
 }

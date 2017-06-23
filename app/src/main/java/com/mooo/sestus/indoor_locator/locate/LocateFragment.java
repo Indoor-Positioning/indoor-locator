@@ -1,6 +1,5 @@
 package com.mooo.sestus.indoor_locator.locate;
 
-import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,16 +12,11 @@ import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.mooo.sestus.indoor_locator.R;
 import com.mooo.sestus.indoor_locator.viewfloorplan.PinView;
 
+import java.util.Collection;
+
 
 public class LocateFragment extends Fragment implements LocateContract.View {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String FP_ID = "FLOOR_PLAN_ID";
-    private static final String POINT_ID = "POINT_ID";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private LocateContract.Presenter presenter;
     private PinView floorPlanImage;
@@ -34,22 +28,10 @@ public class LocateFragment extends Fragment implements LocateContract.View {
     }
 
 
-    public static LocateFragment newInstance(String floorPlan) {
-        LocateFragment fragment = new LocateFragment();
-        Bundle args = new Bundle();
-        args.putString(FP_ID, floorPlan);
-        fragment.setArguments(args);
-        return fragment;
+    public static LocateFragment newInstance(int floorPlan) {
+        return new LocateFragment();
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(FP_ID);
-            mParam2 = getArguments().getString(POINT_ID);
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -78,16 +60,46 @@ public class LocateFragment extends Fragment implements LocateContract.View {
     }
 
     @Override
+    public void showNearestPoi(final PointF pointF) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                floorPlanImage.setNearByPoi(pointF);
+            }
+        });
+    }
+
+    @Override
+    public void showIsOnPoi(final PointF pointF) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                floorPlanImage.setActivePoi(pointF);
+            }
+        });
+    }
+
+    @Override
     public void showDistance(final String poindDistance) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 distanceTextView.setText(poindDistance);
             }
-        });;
+        });
 
     }
-    public void showFloorPlanImage(Bitmap image) {
-        floorPlanImage.setImage(ImageSource.cachedBitmap(image));
+
+    @Override
+    public void showFloorPlanImage(final String resourceName, final Collection<PointF> pointsOfInterest) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int resourceId = getContext().getResources().getIdentifier(resourceName, "drawable", getContext().getPackageName());
+                floorPlanImage.setImage(ImageSource.resource(resourceId));
+                floorPlanImage.setPois(pointsOfInterest);
+            }
+        });
+
     }
 }

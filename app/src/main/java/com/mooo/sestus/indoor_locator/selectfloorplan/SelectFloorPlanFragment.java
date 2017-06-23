@@ -19,7 +19,6 @@ import com.mooo.sestus.indoor_locator.data.FloorPlan;
 import com.mooo.sestus.indoor_locator.viewfloorplan.ViewFloorPlanActivity;
 
 import java.util.Collection;
-import java.util.SortedSet;
 
 
 /**
@@ -85,7 +84,7 @@ public class SelectFloorPlanFragment extends Fragment implements SelectFloorPlan
     }
 
     @Override
-    public void startViewFloorPlanActivity(String floorPlanId) {
+    public void startViewFloorPlanActivity(int floorPlanId) {
         Intent intent = new Intent(getContext(), ViewFloorPlanActivity.class);
         intent.putExtra(ViewFloorPlanActivity.FLOOR_PLAN_ID, floorPlanId);
         startActivity(intent);

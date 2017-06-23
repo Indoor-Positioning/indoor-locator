@@ -5,31 +5,44 @@ import android.graphics.PointF;
 
 import com.mooo.sestus.indoor_locator.BasePresenter;
 import com.mooo.sestus.indoor_locator.BaseView;
+import com.mooo.sestus.indoor_locator.data.FingerPrintedLocation;
+import com.mooo.sestus.indoor_locator.data.PointOfInterest;
 
 import java.util.Collection;
+import java.util.List;
 
 
 public interface ViewFloorPlanContract {
 
     interface View extends BaseView<Presenter> {
-        void showFloorPlanImage(Bitmap image, Collection<PointF> pinnedLocations);
+        void showFloorPlanImage(String resourceName, Collection<PointF> pinnedLocations, Collection<PointF> floorPlanPois);
 
         void showConfirmAddPinToFloorPlan(PointF pin);
 
-        void showStartScanningActivity(String floorPlanId, int pinnedLocationId);
+        void showConfirmAddPoiToFloorPlan(PointF pin);
+
+        void showStartScanningActivity(int pinnedLocationId);
 
         void showPin(PointF pin);
 
+        void showPoi(PointF pin);
+
         void showSelectedPin(PointF pin);
 
+        void showSelectedPoi(PointF pin);
+
         void removePin(PointF awaitingPin);
+
+        void removePoi(PointF awaitingPin);
     }
 
     interface Presenter extends BasePresenter {
-        void onPinConfirmed();
+        void onPointConfirmed();
 
         void onUserClickedFloorPlan(PointF pointF);
 
-        void scanSelectedPin();
+        void onUserLongClickedFloorPlan(PointF pointF);
+
+        void scanSelectedPoint();
     }
 }

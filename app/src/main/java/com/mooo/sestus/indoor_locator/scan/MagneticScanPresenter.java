@@ -1,5 +1,6 @@
 package com.mooo.sestus.indoor_locator.scan;
 
+import com.mooo.sestus.indoor_locator.data.FingerPrint;
 import com.mooo.sestus.indoor_locator.data.FloorPlanRepository;
 import com.mooo.sestus.indoor_locator.data.SensorRepository;
 
@@ -14,25 +15,23 @@ public class MagneticScanPresenter implements MagneticScanContract.Presenter, Se
     private final Runnable recordingRunnable;
     private final FloorPlanRepository floorPlanRepository;
     private final int pointId;
-    private final String floorPlanId;
     private ScheduledFuture scheduledRecordingTask;
     private ScheduledExecutorService scheduler;
     private int measurementCount = 0;
-    private float[] newMeasurement = new float[7];
+    private FingerPrint newMeasurement = new FingerPrint();
     private int fingerPrintsAdded = 0;
 
     public MagneticScanPresenter(final FloorPlanRepository floorPlanRepository, final SensorRepository sensorRepository,
-                                 MagneticScanContract.View view, final String floorPlanId, final int pointId) {
+                                 MagneticScanContract.View view, final int pointId) {
         this.sensorRepository = sensorRepository;
         this.floorPlanRepository = floorPlanRepository;
         this.view = view;
-        this.floorPlanId = floorPlanId;
         this.pointId = pointId;
         this.recordingRunnable = new Runnable() {
             @Override
             public void run() {
-                float[] measurements = MagneticScanPresenter.this.sensorRepository.getMeasurement();
-                processMeasurement(measurements);
+                FingerPrint fingerPrint = MagneticScanPresenter.this.sensorRepository.getCurrentFingerPrint();
+                processMeasurement(fingerPrint, pointId);
             }
         };
         view.setPresenter(this);
@@ -60,7 +59,7 @@ public class MagneticScanPresenter implements MagneticScanContract.Presenter, Se
     @Override
     public void stopRecording() {
         scheduledRecordingTask.cancel(true);
-        floorPlanRepository.saveFingerPrints(floorPlanId, pointId);
+        floorPlanRepository.saveFingerPrints();
         view.showAddedFingerPrints(fingerPrintsAdded);
     }
 
@@ -84,17 +83,16 @@ public class MagneticScanPresenter implements MagneticScanContract.Presenter, Se
         view.updateRssi(wifiRssi);
     }
 
-    private void processMeasurement(float[] measurement) {
+    private void processMeasurement(FingerPrint fingerPrint, int pointId) {
         measurementCount++;
-        for (int i = 0; i < measurement.length; i++) {
-            newMeasurement[i] += measurement[i];
-            if (measurementCount == 5)
-                newMeasurement[i] /= 5;
-        }
+        newMeasurement.add(fingerPrint);
         if (measurementCount == 5) {
-            floorPlanRepository.addFingerPrint(floorPlanId, pointId, newMeasurement);
+            newMeasurement.divideBy(5);
+            newMeasurement.setFingerPrintedLocationId(pointId);
+            floorPlanRepository.addFingerPrint(FingerPrint.clone(newMeasurement));
             fingerPrintsAdded++;
             measurementCount = 0;
+            newMeasurement.clear();
         }
     }
 }

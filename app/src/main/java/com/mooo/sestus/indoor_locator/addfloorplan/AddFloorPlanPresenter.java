@@ -44,7 +44,7 @@ public class AddFloorPlanPresenter implements AddFloorPlanContract.Presenter {
             view.showEmptyPhotoError();
             return;
         }
-        if (repository.containsFloorPlan(name, photo)) {
+        if (repository.containsFloorPlan(name)) {
             view.showFloorPlanNameAlreadyExists();
             return;
         }

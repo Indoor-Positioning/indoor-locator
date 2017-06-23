@@ -1,11 +1,19 @@
 package com.mooo.sestus.indoor_locator.locate;
 
+import android.graphics.PointF;
 import android.util.Log;
 
+import com.mooo.sestus.indoor_locator.data.FingerPrint;
+import com.mooo.sestus.indoor_locator.data.FingerPrintedLocation;
 import com.mooo.sestus.indoor_locator.data.FloorPlanRepository;
+import com.mooo.sestus.indoor_locator.data.PointOfInterest;
+import com.mooo.sestus.indoor_locator.data.ResolvedLocation;
 import com.mooo.sestus.indoor_locator.data.SensorRepository;
 import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,22 +30,21 @@ public class LocatePresenter implements LocateContract.Presenter {
     private final LocateContract.View view;
     private final FloorPlanRepository floorPlanRepository;
     private final Runnable locateRunnable;
-    private final String floorPlanId;
+    private final int floorPlanId;
     private ScheduledExecutorService scheduler;
     private ScheduledFuture scheduledRecordingTask;
-    private float[] averageMeasurement = new float[7];
+    private FingerPrint averagedFingerprint = new FingerPrint();
     private int samplesCollected;
     private LinkedList<Integer> lastResolvedLocations = new LinkedList<>();
     private int lastResolvedPoint = -1;
     private HashMap<Integer, Integer> locationOccurences = new HashMap<>();
-    private int lastComputedDistance;
     private static final double ORIENTATION_DISTANCE_NORMALIZATION_FACTOR = 0.2;
     private static final int WIFI_RSSI_DISTANCE_NORMALIZATION_FACTOR = 4;
     private Map<Integer, List<Float[]>> fingerPrints;
 
 
     public LocatePresenter(final FloorPlanRepository floorPlanRepository, final SensorRepository sensorRepository,
-                           final LocateContract.View view, final String floorPlanId) {
+                           final LocateContract.View view, int floorPlanId) {
         this.sensorRepository = sensorRepository;
         this.floorPlanRepository = floorPlanRepository;
         this.view = view;
@@ -60,28 +67,37 @@ public class LocatePresenter implements LocateContract.Presenter {
 
     @Override
     public void start() {
-        view.showFloorPlanImage(floorPlanRepository.getFloorPlanById(floorPlanId).getImage());
+        final List<PointF> pois = new ArrayList<>();
+        floorPlanRepository.getFloorPlanPois(floorPlanId, new FloorPlanRepository.LoadPointOfInterestsCallback() {
+            @Override
+            public void onPoisLoaded(Collection<PointOfInterest> locations) {
+                for (PointOfInterest location: locations) {
+                    pois.add(new PointF(location.getXCoord(), location.getYCoord()));
+                }
+                view.showFloorPlanImage(floorPlanRepository.getFloorPlanById(floorPlanId).getResourceName(), pois);
+            }
+
+            @Override
+            public void onDataNotAvailable() {}
+        });
         if (scheduler == null || scheduler.isShutdown())
             scheduler = Executors.newScheduledThreadPool(1);
         sensorRepository.register(null);
         scheduledRecordingTask = scheduler.scheduleWithFixedDelay(locateRunnable, 400, 200, TimeUnit.MILLISECONDS);
-        this.fingerPrints = floorPlanRepository.getFingerPrints(floorPlanId);
     }
 
     @Override
     public void stop() {
+        scheduledRecordingTask.cancel(true);
         sensorRepository.deRegister();
         scheduler.shutdown();
     }
 
     @Override
-    public void startRecording() {
-    }
+    public void startRecording() {}
 
     @Override
-    public void stopRecording() {
-        scheduledRecordingTask.cancel(true);
-    }
+    public void stopRecording() {}
 
     private int getResolvedPoint() {
         locationOccurences.clear();
@@ -102,25 +118,26 @@ public class LocatePresenter implements LocateContract.Presenter {
         return point;
     }
 
-    private int getClosestPoint(float[] measurement) {
-        if (fingerPrints == null)
-            return -1;
-        Set<Map.Entry<Integer, List<Float[]>>> entrySet = fingerPrints.entrySet();
-        int distance = Integer.MAX_VALUE;
-        int pointId = 0;
-        Log.v("LOCATE", String.format("Locating fingerprint %s on %d points", Arrays.toString(measurement), entrySet.size()));
-        for (Map.Entry<Integer, List<Float[]>> entry : entrySet) {
-            Log.v("LOCATE", String.format("Trying Point %d which has %d fingerprints", entry.getKey(), entry.getValue().size()));
-            for (Float[] fingerprint: entry.getValue()) {
-                int newDistance = computeDistance(fingerprint, measurement);
-                if (newDistance < distance) {
-                    distance = newDistance;
-                    pointId = entry.getKey();
-                }
-            }
-        }
-        lastComputedDistance = distance;
-        return pointId;
+    private int getClosestPoint(FingerPrint fingerPrint) {
+//        if (fingerPrints == null)
+//            return -1;
+//        Set<Map.Entry<Integer, List<Float[]>>> entrySet = fingerPrints.entrySet();
+//        int distance = Integer.MAX_VALUE;
+//        int pointId = 0;
+//        Log.v("LOCATE", String.format("Locating fingerprint %s on %d points", Arrays.toString(measurement), entrySet.size()));
+//        for (Map.Entry<Integer, List<Float[]>> entry : entrySet) {
+//            Log.v("LOCATE", String.format("Trying Point %d which has %d fingerprints", entry.getKey(), entry.getValue().size()));
+//            for (Float[] fingerprint: entry.getValue()) {
+//                int newDistance = computeDistance(fingerprint, measurement);
+//                if (newDistance < distance) {
+//                    distance = newDistance;
+//                    pointId = entry.getKey();
+//                }
+//            }
+//        }
+//        lastComputedDistance = distance;
+//        return pointId;
+        return 0;
     }
 
 
@@ -163,29 +180,48 @@ public class LocatePresenter implements LocateContract.Presenter {
         return new Runnable() {
             @Override
             public void run() {
-                float[] measurements = LocatePresenter.this.sensorRepository.getMeasurement();
-                averageMeasurement = ArrayUtils.addAll(measurements, averageMeasurement);
+                FingerPrint fingerPrint = LocatePresenter.this.sensorRepository.getCurrentFingerPrint();
+                averagedFingerprint.add(fingerPrint);
                 if (++samplesCollected == 5) {
-                    divideArrayBy(5, averageMeasurement);
-                    int closestPoint = getClosestPoint(measurements);
-                    if (lastComputedDistance >= 24) {
-                        view.showDistance(String.format(Locale.getDefault(), "Point: %d\n Dist: %d", closestPoint, lastComputedDistance));
-                    } else {
-                        addResolvedLocation(closestPoint);
-                        int resolvedPoint = getResolvedPoint();
-                        if (resolvedPoint != lastResolvedPoint) {
-                            lastResolvedPoint = resolvedPoint;
-                            view.showLocatedPointId(floorPlanRepository.getFloorPlanPoints(floorPlanId).get(lastResolvedPoint));
-                            view.showDistance(String.format(Locale.getDefault(), "Point: %d\n Dist: %d", closestPoint, lastComputedDistance));
-                        }
-                        else {
-                            view.showDistance(String.format(Locale.getDefault(), "Point: %d\n Dist: %d", closestPoint, lastComputedDistance));
-                        }
-                    }
-                    samplesCollected = 0;
-                    Arrays.fill(averageMeasurement, 0f);
-                }
+                    averagedFingerprint.divideBy(5);
+                    floorPlanRepository.getClosestPoint(floorPlanId, averagedFingerprint, new FloorPlanRepository.LocateCallback() {
+                        @Override
+                        public void onLocateResult(ResolvedLocation resolvedLocation) {
+                            if (resolvedLocation.getFingerPrintDistance() >= 24) {
+                                view.showDistance(String.format(Locale.getDefault(), "Point: %d\n Dist: %d",
+                                        resolvedLocation.getClosestFingerPrintedLocation(), resolvedLocation.getFingerPrintDistance()));
+                            } else {
+                                addResolvedLocation(resolvedLocation.getClosestFingerPrintedLocation());
+                                int resolvedPoint = getResolvedPoint();
+                                if (resolvedPoint != lastResolvedPoint) {
+                                    lastResolvedPoint = resolvedPoint;
+                                    FingerPrintedLocation point = floorPlanRepository.getFingerPrintedLocationById(lastResolvedPoint);
+                                    if (point.isPoi()) {
+                                        view.showIsOnPoi(new PointF(point.getXCoord(), point.getYCoord()));
+                                    }
+                                    else {
+                                        view.showLocatedPointId(new PointF(point.getXCoord(), point.getYCoord()));
+                                        PointOfInterest nearByPoi = floorPlanRepository.getPointOfInterestById(resolvedLocation.getClosestPoi());
+                                        if (nearByPoi != null)
+                                            view.showNearestPoi(new PointF(nearByPoi.getXCoord(), nearByPoi.getYCoord()));
+                                    }
 
+                                    view.showDistance(String.format(Locale.getDefault(), "Point: %d\n Dist: %d",
+                                            resolvedLocation.getClosestFingerPrintedLocation(), resolvedLocation.getFingerPrintDistance()));
+                                }
+                                else {
+                                    view.showDistance(String.format(Locale.getDefault(), "Point: %d\n Dist: %d",
+                                            resolvedLocation.getClosestFingerPrintedLocation(), resolvedLocation.getFingerPrintDistance()));
+                                }
+                            }
+                            samplesCollected = 0;
+                            averagedFingerprint.clear();
+                        }
+                        @Override
+                        public void onError() {}
+                    });
+
+                }
             }
         };
     }

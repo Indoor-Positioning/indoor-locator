@@ -1,6 +1,5 @@
 package com.mooo.sestus.indoor_locator.data;
 
-import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
 import java.util.Objects;
@@ -9,34 +8,40 @@ import java.util.Objects;
  * TODO: Standardize, error-check the FloorPlan id which is currently a simple String.
  */
 public class FloorPlan implements Comparable<FloorPlan> {
-    private final String id;
-    private final Bitmap image;
+    private final int id;
+    private final String name;
+    private final String resourceName;
 
-    public FloorPlan(String id, Bitmap image) {
+    public FloorPlan(int id, String name, String resourceName) {
         this.id = id;
-        this.image = image;
+        this.name = name;
+        this.resourceName = resourceName;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override
     public int compareTo(@NonNull FloorPlan o) {
-        return id.compareTo(o.id);
+        return id > o.id ? 1 : id == o.id ? 0 : -1;
     }
 
     @Override
     public String toString() {
-        return id;
+        return name;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return Objects.hash(id, name);
     }
 
-    public Bitmap getImage() {
-        return image;
+    public String getResourceName() {
+        return resourceName;
     }
 }

@@ -22,8 +22,6 @@ public interface MagneticScanContract {
 
         void updateMagneticAccuracy(int accuracy);
 
-        void updateRotationVectorAccuracy(int accuracy);
-
         void showAddedFingerPrints(int fingerPrintsAdded);
     }
 

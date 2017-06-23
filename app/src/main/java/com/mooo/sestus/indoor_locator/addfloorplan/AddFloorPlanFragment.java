@@ -114,7 +114,7 @@ public class AddFloorPlanFragment extends Fragment implements AddFloorPlanContra
     }
 
     @Override
-    public void startViewFloorPlanActivity(String floorPlanId) {
+    public void startViewFloorPlanActivity(int floorPlanId) {
         Intent intent = new Intent(getContext(), ViewFloorPlanActivity.class);
         intent.putExtra(ViewFloorPlanActivity.FLOOR_PLAN_ID, floorPlanId);
         startActivity(intent);

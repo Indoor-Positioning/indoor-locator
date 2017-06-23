@@ -52,7 +52,8 @@ public class DeviceSensorRepository implements SensorRepository, SensorEventList
     }
 
     @Override
-    public float[] getMeasurement() {
+    public FingerPrint getCurrentFingerPrint() {
+        FingerPrint fp;
         synchronized (lock) {
             float wifiRssi = 0f;
             if (wifiManager.isWifiEnabled())
@@ -60,8 +61,9 @@ public class DeviceSensorRepository implements SensorRepository, SensorEventList
             System.arraycopy(uncalibratedMagneticField, 0, lastMeasurement, 0, 3);
             System.arraycopy(mOrientationAngles, 0, lastMeasurement, 3, 3);
             lastMeasurement[6] = wifiRssi;
+            fp = FingerPrint.createFor(lastMeasurement);
         }
-        return lastMeasurement;
+        return fp;
     }
 
     public static SensorRepository getInstance(Activity activity) {

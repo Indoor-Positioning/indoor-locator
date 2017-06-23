@@ -22,7 +22,7 @@ public class MagneticScanActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        String floorPlanId = getIntent().getStringExtra(FLOOR_PLAN_ID);
+        int floorPlanId = getIntent().getIntExtra(FLOOR_PLAN_ID, -1);
         int pointId = getIntent().getIntExtra(POINT_ID, 0);
         FragmentManager fragManager = this.getSupportFragmentManager();
         MagneticScanFragment fragment = (MagneticScanFragment) fragManager.findFragmentByTag(MAGNETIC_SCAN_FRAGMENT);
@@ -34,7 +34,7 @@ public class MagneticScanActivity extends AppCompatActivity {
         fragManager.beginTransaction()
                 .replace(R.id.cont_magnetic_scan, fragment, MAGNETIC_SCAN_FRAGMENT)
                 .commit();
-        presenter = new MagneticScanPresenter(Injection.provideFloorPlanRepository(this), Injection.provideSensorRepository(this), fragment, floorPlanId, pointId);
+        presenter = new MagneticScanPresenter(Injection.provideFloorPlanRepository(this), Injection.provideSensorRepository(this), fragment, pointId);
     }
 
     @Override

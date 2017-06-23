@@ -30,7 +30,7 @@ import static android.view.View.GONE;
  */
 public class ViewFloorPlanFragment extends Fragment implements ViewFloorPlanContract.View {
     private ViewFloorPlanContract.Presenter presenter;
-    private String floorPlanId;
+    private int floorPlanId;
     private PinView floorPlanImage;
     private FloatingActionButton confirmPinFab;
     private FloatingActionButton scanPointFab;
@@ -40,7 +40,7 @@ public class ViewFloorPlanFragment extends Fragment implements ViewFloorPlanCont
         // Required empty public constructor
     }
 
-    public static ViewFloorPlanFragment newInstance(String floorPlanId) {
+    public static ViewFloorPlanFragment newInstance(int floorPlanId) {
         ViewFloorPlanFragment floorPlanFragment = new ViewFloorPlanFragment();
         floorPlanFragment.floorPlanId = floorPlanId;
         return floorPlanFragment;
@@ -71,14 +71,14 @@ public class ViewFloorPlanFragment extends Fragment implements ViewFloorPlanCont
         confirmPinFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.onPinConfirmed();
+                presenter.onPointConfirmed();
                 confirmPinFab.setVisibility(GONE);
             }
         });
         scanPointFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.scanSelectedPin();
+                presenter.scanSelectedPoint();
             }
         });
         final GestureDetector gestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
@@ -91,7 +91,17 @@ public class ViewFloorPlanFragment extends Fragment implements ViewFloorPlanCont
                 }
                 return true;
             }
+
+            @Override
+            public void onLongPress(MotionEvent e) {
+                if (floorPlanImage.isReady()) {
+                    presenter.onUserLongClickedFloorPlan(floorPlanImage.viewToSourceCoord(e.getX(), e.getY()));
+                } else {
+                    Toast.makeText(getContext(), "Long tap: Image not ready", Toast.LENGTH_SHORT).show();
+                }
+            }
         });
+
         floorPlanImage.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -107,9 +117,16 @@ public class ViewFloorPlanFragment extends Fragment implements ViewFloorPlanCont
     }
 
     @Override
-    public void showFloorPlanImage(Bitmap bitmap, Collection<PointF> pinnedLocations) {
-        floorPlanImage.setImage(ImageSource.cachedBitmap(bitmap));
-        floorPlanImage.setPins(pinnedLocations);
+    public void showFloorPlanImage(final String resourceName, final Collection<PointF> pinnedLocations, final Collection<PointF> floorPlanPois) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int resourceId = getContext().getResources().getIdentifier(resourceName, "drawable", getContext().getPackageName());
+                floorPlanImage.setImage(ImageSource.resource(resourceId));
+                floorPlanImage.setPins(pinnedLocations);
+                floorPlanImage.setPois(floorPlanPois);
+            }
+        });
     }
 
     @Override
@@ -120,9 +137,15 @@ public class ViewFloorPlanFragment extends Fragment implements ViewFloorPlanCont
     }
 
     @Override
-    public void showStartScanningActivity(String floorPlanId, int pinnedLocationId) {
+    public void showConfirmAddPoiToFloorPlan(PointF pin) {
+        floorPlanImage.addNewPoi(pin);
+        scanPointFab.setVisibility(View.GONE);
+        confirmPinFab.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void showStartScanningActivity(int pinnedLocationId) {
         Intent intent = new Intent(getContext(), MagneticScanActivity.class);
-        intent.putExtra(MagneticScanActivity.FLOOR_PLAN_ID, floorPlanId);
         intent.putExtra(MagneticScanActivity.POINT_ID, pinnedLocationId);
         startActivity(intent);
     }
@@ -133,6 +156,11 @@ public class ViewFloorPlanFragment extends Fragment implements ViewFloorPlanCont
     }
 
     @Override
+    public void showPoi(PointF pin) {
+        floorPlanImage.setAddedPoi(pin);
+    }
+
+    @Override
     public void showSelectedPin(PointF pin) {
         floorPlanImage.setSelectedPin(pin);
         confirmPinFab.setVisibility(View.GONE);
@@ -140,7 +168,19 @@ public class ViewFloorPlanFragment extends Fragment implements ViewFloorPlanCont
     }
 
     @Override
+    public void showSelectedPoi(PointF pin) {
+        floorPlanImage.setSelectedPoi(pin);
+        confirmPinFab.setVisibility(View.GONE);
+        scanPointFab.setVisibility(View.VISIBLE);
+    }
+
+    @Override
     public void removePin(PointF pin) {
         floorPlanImage.removePin(pin);
+    }
+
+    @Override
+    public void removePoi(PointF pin) {
+        floorPlanImage.removePoi(pin);
     }
 }
