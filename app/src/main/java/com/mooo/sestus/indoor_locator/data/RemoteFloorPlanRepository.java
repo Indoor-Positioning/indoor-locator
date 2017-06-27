@@ -33,7 +33,7 @@ public class RemoteFloorPlanRepository implements FloorPlanRepository {
     private LocateCallback locateCallback;
 
     private RemoteFloorPlanRepository() {
-        Request request = new Request.Builder().url("ws://192.168.1.2:8000").build();
+        Request request = new Request.Builder().url("ws://okea.mooo.com:8000").build();
         DjangoChannelListener listener = new DjangoChannelListener();
         ws = new OkHttpClient().newWebSocket(request, listener);
         gson = new Gson();
