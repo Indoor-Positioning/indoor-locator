@@ -164,10 +164,14 @@ public class ViewFloorPlanPresenter implements ViewFloorPlanContract.Presenter {
 
     @Override
     public void scanSelectedPoint() {
-        if (selectedExistingPoint != null)
+        if (selectedExistingPoint != null) {
             view.showStartScanningActivity(selectedExistingPoint.getId());
-        else if (selectedExistingPoi != null)
+            selectedExistingPoint = null;
+        }
+        else if (selectedExistingPoi != null) {
             view.showStartScanningActivity(selectedExistingPoi.getRelatedFingerPrintedLocId());
+            selectedExistingPoi= null;
+        }
     }
 
     private boolean areClose(FingerPrintedLocation point, FingerPrintedLocation nearestPoint) {
