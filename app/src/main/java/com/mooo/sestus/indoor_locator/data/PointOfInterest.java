@@ -38,4 +38,8 @@ public class PointOfInterest {
     public int getRelatedFingerPrintedLocId() {
         return relatedFingerPrintedLocId;
     }
+
+    public String getName() {
+        return name;
+    }
 }

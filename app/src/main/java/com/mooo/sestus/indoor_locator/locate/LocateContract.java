@@ -15,7 +15,7 @@ public interface LocateContract {
 
         void showNearestPoi(PointF pointF);
 
-        void showIsOnPoi(PointF pointF);
+        void showIsOnPoi(PointF pointF, String name);
 
         void showDistance(String pointDistance);
 

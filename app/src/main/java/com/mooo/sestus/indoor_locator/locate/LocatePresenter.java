@@ -197,7 +197,7 @@ public class LocatePresenter implements LocateContract.Presenter {
                                     lastResolvedPoint = resolvedPoint;
                                     FingerPrintedLocation point = floorPlanRepository.getFingerPrintedLocationById(lastResolvedPoint);
                                     if (point.isPoi()) {
-                                        view.showIsOnPoi(new PointF(point.getXCoord(), point.getYCoord()));
+                                        view.showIsOnPoi(new PointF(point.getXCoord(), point.getYCoord()), floorPlanRepository.getPointOfInterestById(point.getRelatedPoi()).getName());
                                     }
                                     else {
                                         view.showLocatedPointId(new PointF(point.getXCoord(), point.getYCoord()));

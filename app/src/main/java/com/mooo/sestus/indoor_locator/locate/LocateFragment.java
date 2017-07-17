@@ -2,6 +2,7 @@ package com.mooo.sestus.indoor_locator.locate;
 
 import android.graphics.PointF;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,10 +10,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.google.common.base.Strings;
 import com.mooo.sestus.indoor_locator.R;
 import com.mooo.sestus.indoor_locator.viewfloorplan.PinView;
 
 import java.util.Collection;
+import java.util.Locale;
 
 
 public class LocateFragment extends Fragment implements LocateContract.View {
@@ -70,11 +73,13 @@ public class LocateFragment extends Fragment implements LocateContract.View {
     }
 
     @Override
-    public void showIsOnPoi(final PointF pointF) {
+    public void showIsOnPoi(final PointF pointF, final String name) {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 floorPlanImage.setActivePoi(pointF);
+                if (!Strings.isNullOrEmpty(name))
+                    Snackbar.make(getView(), String.format(Locale.getDefault(), "Reached POI : %s", name), Snackbar.LENGTH_LONG).show();
             }
         });
     }
