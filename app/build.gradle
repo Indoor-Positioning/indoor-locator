@@ -1,8 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
+
+    flavorDimensions "default"
+
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "com.mooo.sestus.indoor_locator"
         minSdkVersion 21
