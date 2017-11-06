@@ -26,6 +26,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class LocatePresenter implements LocateContract.Presenter {
+    public static final int DISTANCE_CLOSE_THRESHOLD = 24;
     private final SensorRepository sensorRepository;
     private final LocateContract.View view;
     private final FloorPlanRepository floorPlanRepository;
@@ -187,7 +188,7 @@ public class LocatePresenter implements LocateContract.Presenter {
                     floorPlanRepository.getClosestPoint(floorPlanId, averagedFingerprint, new FloorPlanRepository.LocateCallback() {
                         @Override
                         public void onLocateResult(ResolvedLocation resolvedLocation) {
-                            if (resolvedLocation.getFingerPrintDistance() >= 24) {
+                            if (resolvedLocation.getFingerPrintDistance() >= DISTANCE_CLOSE_THRESHOLD) {
                                 view.showDistance(String.format(Locale.getDefault(), "Point: %d\n Dist: %d",
                                         resolvedLocation.getClosestFingerPrintedLocation(), resolvedLocation.getFingerPrintDistance()));
                             } else {
