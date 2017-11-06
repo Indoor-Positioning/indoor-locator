@@ -48,7 +48,7 @@ The user selects a location or a POI to scan, and then uploads its fingerprint t
 </p>
 
 
-#### Locate
+##### Locate
 
 The user requests to be located. A fingerprint is sent (through the websocket) and the servers responds
 with the estimated location. If the location is a POI a snackbar is shown to let the user know.
@@ -57,3 +57,19 @@ with the estimated location. If the location is a POI a snackbar is shown to let
     <img src="https://user-images.githubusercontent.com/8919901/32418851-b7c40b44-c279-11e7-9a5c-aede496ec111.gif" width="180" height="300" align="left">
     <img src="https://user-images.githubusercontent.com/8919901/32418852-b7e9502a-c279-11e7-97b9-eecdebd9945a.gif" width="180" height="300" align="center">
 </p>
+
+
+### Notes - Future Work
+
+- **Change the mechanism for loading the floor plan image** drawable for every floorplan must be present in the res/drawable directory. This was done
+in order to avoid transferring (and serializing - deserializing imaged over the websocket).
+The drawable must have the same name as the corresponding resource_name field in the floor plan 
+table of the server.
+
+- **Define proximity properly.** Currently when a server responds with a match (a finger-printed
+location or a POI), the distance of this closest fingerprint is returned. The client then decides
+if the closest fingerprint is indeed close, and that is currently hardcoded in [Locatorpresenter.java#L29](https://github.com/Indoor-Positioning/indoor-locator/blob/master/app/src/main/java/com/mooo/sestus/indoor_locator/locate/LocatePresenter.java#L29)
+If this distance value is too big then we assume that we don't have a matching fingerprint
+thus we can't determine the location.
+
+- **Eliminate false positives in a proper way**. 
