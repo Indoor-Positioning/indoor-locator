@@ -59,7 +59,7 @@ with the estimated location. If the location is a POI a snackbar is shown to let
 </p>
 
 
-### Notes - Future Work
+### Notes - Thoughts for Future Work
 
 - **Change the mechanism for loading the floor plan image** drawable for every floorplan must be present in the res/drawable directory. This was done
 in order to avoid transferring (and serializing - deserializing imaged over the websocket).
@@ -72,4 +72,21 @@ if the closest fingerprint is indeed close, and that is currently hardcoded in [
 If this distance value is too big then we assume that we don't have a matching fingerprint
 thus we can't determine the location.
 
-- **Eliminate false positives in a proper way**. 
+- **Eliminate false positives in a proper way**. When two locations have similar fingerprints
+we can have "false positives", meaning that the server responds with a match (i.e a matching location
+and a distance which is less than the configured distance threshold) that is wrong. We try to 
+eliminate these false positives using a queue (a LinkedList - see [here](https://github.com/Indoor-Positioning/indoor-locator/blob/master/app/src/main/java/com/mooo/sestus/indoor_locator/locate/LocatePresenter.java#L39)) which has the last 5
+resolved locations. Majority wins, meaning that if the queue contains location A 4 times and 
+location B 1 time, the location B is considered a false positive - thus discarded. This 
+needs to be handled in a better way - probably on the server side.
+
+- **Reduce the noise on the measurements properly**. We currently do averaging (5 measurements
+averaged to produce a value) in address to address the noise of the phone sensors. The sensors
+produced by the accelerometer is a combination of Gaussian and non-Gaussian noise.
+
+- **Come up with a model to address variance between different android phones**. Measurements
+are greatly affected by the model of the android phone (e.g due to different sensors useed, different
+orientation of the sensors etc). We could probably extract some parameters / come up with a model
+to address this variance.
+
+- **Replace Sqlite with a proper database**
