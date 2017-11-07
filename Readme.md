@@ -81,7 +81,7 @@ location B 1 time, the location B is considered a false positive - thus discarde
 needs to be handled in a better way - probably on the server side.
 
 - **Reduce the noise on the measurements properly**. We currently do averaging (5 measurements
-averaged to produce a value) in address to address the noise of the phone sensors. The sensors
+averaged to produce a value - see [MagneticScanPresenter](https://github.com/Indoor-Positioning/indoor-locator/blob/master/app/src/main/java/com/mooo/sestus/indoor_locator/scan/MagneticScanPresenter.java)) in address to address the noise of the phone sensors. The sensors
 produced by the accelerometer is a combination of Gaussian and non-Gaussian noise.
 
 - **Come up with a model to address variance between different android phones**. Measurements
